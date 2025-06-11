@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Trang quản trị</title>
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.2/css/bootstrap.min.css}" />
+    <link th:rel="stylesheet" th:href="@{/webjars/font-awesome/5.15.4/css/all.css}" />
+    <script th:src="@{/webjars/jquery/3.6.3/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/5.2.2/js/bootstrap.bundle.min.js}"></script>
+    <style>
+        .sidebar .nav-link:hover {
+            background-color: #6c757d;
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row min-vh-100">
+        <nav class="col-md-2 d-none d-md-block bg-dark sidebar py-4">
+            <div class="position-sticky">
+                <h5 class="text-center text-white">Quản trị</h5>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link  text-white active" th:href="@{/admin/dashboard}">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link  text-white" th:href="@{/admin/users}">
+                            <i class="fas fa-users"></i> Người dùng
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link  text-white" th:href="@{/admin/courses}">
+                            <i class="fas fa-book"></i> Khóa học
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link  text-white" th:href="@{/logout}">
+                            <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="col-md-10 ms-sm-auto px-md-4 py-4 bg-body-tertiary">
+            <h2>Chào mừng đến trang quản trị</h2>
+            <p>Chọn chức năng từ menu bên trái để quản lý hệ thống.</p>
+
+            <div th:replace="${mainContent} :: content"></div>
+        </main>
+    </div>
+</div>
+</body>
+</html>
