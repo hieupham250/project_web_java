@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:fragment="addCourseModal">
+    <div class="modal fade" id="addCourseModal" tabindex="-1" aria-labelledby="addCourseModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form th:action="@{/admin/courses}" method="post" class="modal-content" enctype="multipart/form-data" th:object="${courseDTO}">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCourseModalLabel">Thêm khóa học mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Tên khóa học</label>
+                        <input type="text" class="form-control" id="name" th:field="*{name}">
+                        <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="duration" class="form-label">Thời lượng (giờ)</label>
+                        <input type="number" class="form-control" id="duration" th:field="*{duration}">
+                        <div class="text-danger" th:if="${#fields.hasErrors('duration')}" th:errors="*{duration}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="instructor" class="form-label">Giảng viên</label>
+                        <input type="text" class="form-control" id="instructor" th:field="*{instructor}">
+                        <div class="text-danger" th:if="${#fields.hasErrors('instructor')}" th:errors="*{instructor}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="imageFile" class="form-label">Chọn ảnh khóa học</label>
+                        <input type="file" class="form-control" id="imageFile" th:field="*{imageFile}" accept="image/*">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -27,13 +27,13 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link  text-white" th:href="@{/admin/users}">
-                            <i class="fas fa-users"></i> Người dùng
+                        <a class="nav-link  text-white" th:href="@{/admin/courses}">
+                            <i class="fas fa-book"></i> Khóa học
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link  text-white" th:href="@{/admin/courses}">
-                            <i class="fas fa-book"></i> Khóa học
+                        <a class="nav-link  text-white" th:href="@{/admin/users}">
+                            <i class="fas fa-users"></i> Người dùng
                         </a>
                     </li>
                     <li class="nav-item">
@@ -46,10 +46,7 @@
         </nav>
 
         <main class="col-md-10 ms-sm-auto px-md-4 py-4 bg-body-tertiary">
-            <h2>Chào mừng đến trang quản trị</h2>
-            <p>Chọn chức năng từ menu bên trái để quản lý hệ thống.</p>
-
-            <div th:replace="${mainContent} :: content"></div>
+            <div th:replace="${content}"></div>
         </main>
     </div>
 </div>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Form Khóa Học</title></head>
+<body>
+<div th:fragment="formCourseModal">
+    <div class="modal fade" id="formCourseModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form th:action="@{/admin/courses}" method="post" class="modal-content" enctype="multipart/form-data" th:object="${courseDTO}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm / Cập nhật khóa học</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" th:field="*{id}"/>
+                    <div class="mb-3">
+                        <label class="form-label">Tên khóa học</label>
+                        <input type="text" class="form-control" th:field="*{name}">
+                        <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Thời lượng (giờ)</label>
+                        <input type="number" class="form-control" th:field="*{duration}">
+                        <div class="text-danger" th:if="${#fields.hasErrors('duration')}" th:errors="*{duration}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Giảng viên</label>
+                        <input type="text" class="form-control" th:field="*{instructor}">
+                        <div class="text-danger" th:if="${#fields.hasErrors('instructor')}" th:errors="*{instructor}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Chọn ảnh</label>
+                        <input type="file" class="form-control" th:field="*{imageFile}" accept="image/*">
+                        <div>
+                            <img id="previewImage"
+                                 src=""
+                                 alt="Ảnh hiện tại"
+                                 width="100"
+                                 class="mt-2"
+                                 style="display: none;" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

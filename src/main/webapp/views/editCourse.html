@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.2/css/bootstrap.min.css}" />
+    <link th:rel="stylesheet" th:href="@{/webjars/font-awesome/5.15.4/css/all.css}" />
+    <script th:src="@{/webjars/jquery/3.6.3/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/5.2.2/js/bootstrap.bundle.min.js}"></script>
+</head>
+<body>
+<div th:fragment="editCourseModal">
+    <div class="modal fade" id="editCourseModal" tabindex="-1" aria-labelledby="editCourseModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form th:action="@{/admin/courses/update}" method="post" class="modal-content" enctype="multipart/form-data" id="editCourseForm">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chỉnh sửa khóa học</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="edit-id">
+                    <div class="mb-3">
+                        <label class="form-label">Tên khóa học</label>
+                        <input type="text" class="form-control" name="name" id="edit-name">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Thời lượng</label>
+                        <input type="number" class="form-control" name="duration" id="edit-duration">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Giảng viên</label>
+                        <input type="text" class="form-control" name="instructor" id="edit-instructor">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cập nhật ảnh mới (nếu cần)</label>
+                        <input type="file" class="form-control" name="imageFile" id="edit-imageFile" accept="image/*">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Cập nhật</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -54,7 +54,7 @@ public class AuthController {
         user.setPhone(userDTO.getPhone());
         user.setEmail(userDTO.getEmail());
         user.setPassword(userDTO.getPassword());
-        user.setCreateAt(LocalDate.now());
+        user.setCreate_at(LocalDate.now());
 
         authService.register(user);
 

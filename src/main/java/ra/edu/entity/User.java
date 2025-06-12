@@ -52,7 +52,7 @@ public class User {
     @Column(nullable = false)
     private StatusAccount status = StatusAccount.ACTIVE;
 
-    private LocalDate createAt;
+    private LocalDate create_at;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Enrollment> enrollments;

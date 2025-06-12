@@ -7,7 +7,7 @@ import lombok.Setter;
 import ra.edu.datatype.StatusEnrollment;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
@@ -27,7 +27,7 @@ public class Enrollment {
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
-    private LocalDate registered_at;
+    private LocalDateTime registered_at;
 
     @Enumerated(EnumType.STRING)
     private StatusEnrollment status;
