@@ -42,50 +42,6 @@ public class CourseController {
         return "admin";
     }
 
-//    @PostMapping
-//    public String addCourse(@Valid @ModelAttribute("courseDTO") CourseDTO courseDTO,
-//                            BindingResult bindingResult,
-//                            @RequestParam(required = false) String name,
-//                            @RequestParam(defaultValue = "asc") String sortDirection,
-//                            @RequestParam(defaultValue = "1") int page,
-//                            @RequestParam(defaultValue = "5") int size,
-//                            Model model) {
-//        if (courseService.existsByName(courseDTO.getName())) {
-//            bindingResult.rejectValue("name", "error.courseDTO", "Tên khóa học đã tồn tại");
-//        }
-//
-//        if (bindingResult.hasErrors()) {
-//            prepareCourseList(model, name, sortDirection, page, size);
-//
-//            model.addAttribute("showAddModal", true); // flag để mở modal
-//            model.addAttribute("courseDTO", courseDTO);
-//
-//            return "admin";
-//        }
-//
-//        Course course = new Course();
-//        course.setName(courseDTO.getName());
-//        course.setDuration(courseDTO.getDuration());
-//        course.setInstructor(courseDTO.getInstructor());
-//        course.setImage(courseDTO.getImage());
-//        course.setCreate_at(LocalDate.now());
-//
-//        try {
-//            MultipartFile imageFile = courseDTO.getImageFile();
-//            if (imageFile != null && !imageFile.isEmpty()) {
-//                Map uploadResult = cloudinary.uploader().upload(imageFile.getBytes(), ObjectUtils.emptyMap());
-//                course.setImage(uploadResult.get("url").toString());
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            throw new RuntimeException("Upload ảnh thất bại", e);
-//        }
-//
-//        courseService.create(course);
-//
-//        return "redirect:/admin/courses";
-//    }
-
     @PostMapping
     public String saveOrUpdateCourse(@Valid @ModelAttribute("courseDTO") CourseDTO courseDTO,
                                      BindingResult bindingResult,
@@ -108,22 +64,23 @@ public class CourseController {
 
         Course course = new Course();
         if (isUpdate) {
-            course.setId(courseDTO.getId());
+            Course oldCourse = courseService.findById(courseDTO.getId());
+            course.setId(oldCourse.getId());
+            course.setCreate_at(oldCourse.getCreate_at());
+            course.setImage(oldCourse.getImage());
+        } else {
+            course.setCreate_at(LocalDate.now());
         }
+
         course.setName(courseDTO.getName());
         course.setDuration(courseDTO.getDuration());
         course.setInstructor(courseDTO.getInstructor());
-        if (!isUpdate) course.setCreate_at(LocalDate.now());
 
         try {
             MultipartFile imageFile = courseDTO.getImageFile();
             if (imageFile != null && !imageFile.isEmpty()) {
                 Map uploadResult = cloudinary.uploader().upload(imageFile.getBytes(), ObjectUtils.emptyMap());
                 course.setImage(uploadResult.get("url").toString());
-            } else if (isUpdate) {
-                Course oldCourse = courseService.findById(courseDTO.getId());
-                course.setImage(oldCourse.getImage());
-                course.setCreate_at(oldCourse.getCreate_at());// giữ ảnh cũ
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -135,8 +92,10 @@ public class CourseController {
         } else {
             courseService.create(course);
         }
+
         return "redirect:/admin/courses";
     }
+
 
     private void prepareCourseList(Model model, String name, String sortDirection, int page, int size) {
         List<Course> courses = courseService.findAll(name, sortDirection, page, size);
@@ -160,5 +119,11 @@ public class CourseController {
         model.addAttribute("name", name);
         model.addAttribute("sortDirection", sortDirection);
         model.addAttribute("content", "listCourse");
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteCourse(@PathVariable("id") int id) {
+        courseService.delete(id);
+        return "redirect:/admin/courses";
     }
 }

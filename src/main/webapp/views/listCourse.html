@@ -12,9 +12,6 @@
     <div class="container bg-white" th:fragment="listCourse">
         <div class="mb-4 d-flex justify-content-between">
             <h2>Danh sách khóa học</h2>
-<!--            <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addCourseModal">-->
-<!--                Thêm khóa học mới-->
-<!--            </button>-->
             <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#formCourseModal">
                 Thêm khóa học mới
             </button>
@@ -62,7 +59,7 @@
                            th:data-image="${course.image}">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <a th:href="@{'/admin/courses/delete/' + ${course.id}}"
+                        <a th:href="@{/admin/courses/delete/{id}(id=${course.id})}"
                            class="btn btn-sm btn-danger"
                            onclick="return confirm('Bạn có chắc muốn xóa?')"
                            title="Xóa">
@@ -93,8 +90,6 @@
         </nav>
     </div>
 
-<!--    <div th:replace="addCourse :: addCourseModal"></div>-->
-
     <div th:replace="formCourse :: formCourseModal"></div>
 
     <script th:inline="javascript">
@@ -115,15 +110,6 @@
         sortSelect.addEventListener('change', () => {
             searchForm.submit();
         });
-
-        // $(document).ready(function () {
-        //     // Nếu controller gửi flag showAddModal = true, thì bật modal lên
-        //     let showAddModal = /*[[${showAddModal}]]*/ false;
-        //     if (showAddModal) {
-        //         let myModal = new bootstrap.Modal(document.getElementById('addCourseModal'));
-        //         myModal.show();
-        //     }
-        // });
 
         const showModalFlag = /*[[${showFormModal}]]*/ false;
         if (showModalFlag) {
