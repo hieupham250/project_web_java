@@ -18,9 +18,10 @@
         </div>
         <div class="mb-4 d-flex justify-content-between align-items-center">
             <form id="searchForm" class="d-flex" th:action="@{/admin/courses}" method="get">
-                <input class="form-control me-2" type="search" placeholder="Tìm khóa học" aria-label="Search" name="name"
+                <input class="form-control me-2" type="search" placeholder="Tìm khóa học theo tên" aria-label="Search" name="name"
                        th:value="${name}" id="searchInput">
-                <select class="form-select me-2" name="sortDirection" style="width: 150px;" id="sortSelect">
+                <select class="form-select me-2" name="sortDirection" style="width: 170px;" id="sortSelect">
+                    <option th:value="${null}" th:selected="${sortDirection == null}">Sắp xếp theo tên</option>
                     <option th:value="asc" th:selected="${sortDirection == 'asc'}">Tăng dần</option>
                     <option th:value="desc" th:selected="${sortDirection == 'desc'}">Giảm dần</option>
                 </select>
@@ -123,11 +124,14 @@
                 const duration = btn.getAttribute('data-duration');
                 const instructor = btn.getAttribute('data-instructor');
                 const image = btn.getAttribute('data-image');
-
                 document.getElementById('id').value = id;
                 document.getElementById('name').value = name;
                 document.getElementById('duration').value = duration;
                 document.getElementById('instructor').value = instructor;
+                document.querySelector('#formCourseModal .modal-title').innerText = 'Cập nhật khóa học';
+                document.querySelector('#formCourseModal button[type="submit"]').innerText = 'Cập nhật';
+
+
                 const previewImg = document.getElementById('previewImage');
 
                 if (image && previewImg) {
@@ -140,6 +144,28 @@
 
                 new bootstrap.Modal(document.getElementById('formCourseModal')).show();
             });
+        });
+
+        function resetCourseForm() {
+            document.getElementById('id').value = '';
+            document.getElementById('name').value = '';
+            document.getElementById('duration').value = '';
+            document.getElementById('instructor').value = '';
+            document.querySelector('#formCourseModal .modal-title').innerText = 'Thêm khóa học';
+            document.querySelector('#formCourseModal button[type="submit"]').innerText = 'Thêm mới';
+
+            const previewImg = document.getElementById('previewImage');
+            if (previewImg) {
+                previewImg.src = '';
+                previewImg.style.display = 'none';
+            }
+
+            document.querySelectorAll('#formCourseModal .text-danger').forEach(e => e.innerText = '');
+        }
+
+        const modalEl = document.getElementById('formCourseModal');
+        modalEl.addEventListener('hidden.bs.modal', function () {
+            resetCourseForm();
         });
     </script>
 </body>

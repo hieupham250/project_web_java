@@ -11,8 +11,10 @@ import org.springframework.web.multipart.MultipartFile;
 import ra.edu.dto.CourseConvertDTO;
 import ra.edu.dto.CourseDTO;
 import ra.edu.entity.Course;
+import ra.edu.entity.User;
 import ra.edu.service.CourseService;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -32,10 +34,16 @@ public class CourseController {
     @GetMapping
     public String courses(
             @RequestParam(required = false) String name,
-            @RequestParam(defaultValue = "asc") String sortDirection,
+            @RequestParam(required = false) String sortDirection,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int size,
-            Model model) {
+            Model model,
+            HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null || !user.getRole().name().equals("ADMIN")) {
+            return "redirect:/auth/login";
+        }
+
         prepareCourseList(model, name, sortDirection, page, size);
 
         model.addAttribute("courseDTO", new CourseDTO());
@@ -46,17 +54,31 @@ public class CourseController {
     public String saveOrUpdateCourse(@Valid @ModelAttribute("courseDTO") CourseDTO courseDTO,
                                      BindingResult bindingResult,
                                      @RequestParam(required = false) String name,
-                                     @RequestParam(defaultValue = "asc") String sortDirection,
+                                     @RequestParam(required = false) String sortDirection,
                                      @RequestParam(defaultValue = "1") int page,
                                      @RequestParam(defaultValue = "5") int size,
                                      Model model) {
         boolean isUpdate = courseDTO.getId() != null;
 
-        if (!isUpdate && courseService.existsByName(courseDTO.getName())) {
+        if (!isUpdate && courseService.existsByName(normalizeName(courseDTO.getName()))) {
             bindingResult.rejectValue("name", "error.courseDTO", "Tên khóa học đã tồn tại");
         }
 
+        // Kiểm tra trùng tên khi cập nhật
+        if (isUpdate) {
+            Course oldCourse = courseService.findById(courseDTO.getId());
+            if (!courseDTO.getName().equalsIgnoreCase(oldCourse.getName())
+                    && courseService.existsByName(normalizeName(courseDTO.getName()))) {
+                bindingResult.rejectValue("name", "error.courseDTO", "Tên khóa học đã tồn tại");
+            }
+        }
+
+        if (!isUpdate && (courseDTO.getImageFile() == null || courseDTO.getImageFile().isEmpty())) {
+            bindingResult.rejectValue("imageFile", "error.courseDTO", "Ảnh không được để trống");
+        }
+
         if (bindingResult.hasErrors()) {
+            name = null;
             prepareCourseList(model, name, sortDirection, page, size);
             model.addAttribute("showFormModal", true);
             return "admin";
@@ -96,6 +118,15 @@ public class CourseController {
         return "redirect:/admin/courses";
     }
 
+    @GetMapping("/delete/{id}")
+    public String deleteCourse(@PathVariable("id") int id, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null || !user.getRole().name().equals("ADMIN")) {
+            return "redirect:/auth/login";
+        }
+        courseService.delete(id);
+        return "redirect:/admin/courses";
+    }
 
     private void prepareCourseList(Model model, String name, String sortDirection, int page, int size) {
         List<Course> courses = courseService.findAll(name, sortDirection, page, size);
@@ -121,9 +152,8 @@ public class CourseController {
         model.addAttribute("content", "listCourse");
     }
 
-    @GetMapping("/delete/{id}")
-    public String deleteCourse(@PathVariable("id") int id) {
-        courseService.delete(id);
-        return "redirect:/admin/courses";
+    private String normalizeName(String name) {
+        if (name == null) return null;
+        return name.trim().replaceAll("\\s+", " ").toLowerCase();
     }
 }

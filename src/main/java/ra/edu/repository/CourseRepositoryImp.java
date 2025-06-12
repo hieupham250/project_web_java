@@ -21,10 +21,10 @@ public class CourseRepositoryImp implements CourseRepository {
 
         if (keyword != null && !keyword.trim().isEmpty()) hql.append(" AND c.name LIKE :keyword");
 
-        if ("desc".equalsIgnoreCase(sortDirection)) {
-            hql.append(" ORDER BY c.name DESC");
-        } else {
+        if ("asc".equalsIgnoreCase(sortDirection)) {
             hql.append(" ORDER BY c.name ASC");
+        } else if ("desc".equalsIgnoreCase(sortDirection)) {
+            hql.append(" ORDER BY c.name DESC");
         }
 
         Query<Course> query = session.createQuery(hql.toString(), Course.class);
