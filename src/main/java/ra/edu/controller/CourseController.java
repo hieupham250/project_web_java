@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ra.edu.dto.CourseConvertDTO;
 import ra.edu.dto.CourseDTO;
 import ra.edu.entity.Course;
@@ -57,7 +58,8 @@ public class CourseController {
                                      @RequestParam(required = false) String sortDirection,
                                      @RequestParam(defaultValue = "1") int page,
                                      @RequestParam(defaultValue = "5") int size,
-                                     Model model) {
+                                     Model model,
+                                     RedirectAttributes redirectAttributes) {
         boolean isUpdate = courseDTO.getId() != null;
 
         if (!isUpdate && courseService.existsByName(normalizeName(courseDTO.getName()))) {
@@ -111,19 +113,27 @@ public class CourseController {
 
         if (isUpdate) {
             courseService.update(course);
+            redirectAttributes.addFlashAttribute("success", "Cập nhật khóa học thành công!");
         } else {
             courseService.create(course);
+            redirectAttributes.addFlashAttribute("success", "Thêm khóa học thành công!");
         }
 
         return "redirect:/admin/courses";
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteCourse(@PathVariable("id") int id, HttpSession session) {
+    public String deleteCourse(@PathVariable("id") int id, HttpSession session, RedirectAttributes redirectAttributes) {
         User user = (User) session.getAttribute("user");
         if (user == null || !user.getRole().name().equals("ADMIN")) {
             return "redirect:/auth/login";
         }
+
+        if (courseService.checkHasStudents(id)) {
+            redirectAttributes.addFlashAttribute("error", "Khóa học đang có sinh viên, không thể xóa!");
+            return "redirect:/admin/courses";
+        }
+        redirectAttributes.addFlashAttribute("success", "Xóa khóa học thành công!");
         courseService.delete(id);
         return "redirect:/admin/courses";
     }

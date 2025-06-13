@@ -93,6 +93,14 @@ public class CourseRepositoryImp implements CourseRepository {
     }
 
     @Override
+    public boolean checkHasStudents(int courseId) {
+        Session session = sessionFactory.openSession();
+        Query<Long> query = session.createQuery("SELECT COUNT(e.id) FROM Enrollment e WHERE e.course.id = :courseId", Long.class);
+        query.setParameter("courseId", courseId);
+        return query.uniqueResult() > 0;
+    }
+
+    @Override
     public void delete(int id) {
         Session session = sessionFactory.openSession();
         session.beginTransaction();

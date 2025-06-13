@@ -48,6 +48,11 @@ public class CourseServiceImp implements CourseService {
     }
 
     @Override
+    public boolean checkHasStudents(int courseId) {
+        return courseRepository.checkHasStudents(courseId);
+    }
+
+    @Override
     public void delete(int id) {
         courseRepository.delete(id);
     }

@@ -12,5 +12,6 @@ public interface CourseService {
     boolean existsByName(String name);
     void create(Course course);
     void update(Course course);
+    boolean checkHasStudents(int courseId);
     void delete(int id);
 }

@@ -9,6 +9,10 @@
     <script th:src="@{/webjars/bootstrap/5.2.2/js/bootstrap.bundle.min.js}"></script>
 </head>
 <body>
+    <div id="alert-container" style="position: fixed; top: 88px; right: 36px; z-index: 9999; min-width: 300px;">
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert" th:text="${error}"></div>
+    </div>
     <div class="container bg-white" th:fragment="listCourse">
         <div class="mb-4 d-flex justify-content-between">
             <h2>Danh sách khóa học</h2>
@@ -60,9 +64,9 @@
                            th:data-image="${course.image}">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <a th:href="@{/admin/courses/delete/{id}(id=${course.id})}"
-                           class="btn btn-sm btn-danger"
-                           onclick="return confirm('Bạn có chắc muốn xóa?')"
+                        <a href="#"
+                           class="btn btn-sm btn-danger btn-delete-course"
+                           th:attr="data-url=@{/admin/courses/delete/{id}(id=${course.id})}"
                            title="Xóa">
                             <i class="fas fa-trash-alt"></i>
                         </a>
@@ -91,7 +95,27 @@
         </nav>
     </div>
 
+<!--    phần hiện modal thêm sửa khóa học -->
     <div th:replace="formCourse :: formCourseModal"></div>
+
+    <!-- Modal Xác nhận Xóa -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">Xác nhận Xóa</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    Bạn có chắc chắn muốn xóa khóa học này không? Hành động này không thể hoàn tác.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <a id="confirmDeleteBtn" class="btn btn-danger">Xác nhận</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script th:inline="javascript">
         const searchInput = document.getElementById('searchInput');
@@ -166,6 +190,30 @@
         const modalEl = document.getElementById('formCourseModal');
         modalEl.addEventListener('hidden.bs.modal', function () {
             resetCourseForm();
+        });
+
+        setTimeout(function() {
+            const container = document.getElementById('alert-container');
+            if (container) {
+                container.style.transition = 'opacity 0.5s ease';
+                container.style.opacity = '0';
+                setTimeout(function() {
+                    container.style.display = 'none';
+                }, 500); // chờ hiệu ứng fade-out
+            }
+        }, 3000);
+
+        // Xử lý nút Xóa bằng Bootstrap Modal
+        const confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+        document.querySelectorAll('.btn-delete-course').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault(); // chặn href mặc định
+                const url = btn.getAttribute('data-url');
+                confirmDeleteBtn.setAttribute('href', url); // gán link xóa vào nút xác nhận
+                confirmDeleteModal.show();
+            });
         });
     </script>
 </body>
