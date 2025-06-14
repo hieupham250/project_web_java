@@ -82,7 +82,7 @@ public class AuthController {
             if (user.getRole() == Role.ADMIN) {
                 return "redirect:/admin";
             } else {
-                return "redirect:/home";
+                return "redirect:/home/courses";
             }
         }
         return "login";

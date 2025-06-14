@@ -12,6 +12,11 @@
             background-color: #6c757d;
             color: white !important;
         }
+
+        .active {
+            background-color: #6c757d;
+            color: white !important;
+        }
     </style>
 </head>
 <body>
@@ -22,17 +27,24 @@
                 <h5 class="text-center text-white">Quản trị</h5>
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link  text-white active" th:href="@{/admin/dashboard}">
+                        <a class="nav-link text-white"
+                           th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/dashboard')} ? ' active' : ''"
+                           th:href="@{/admin/dashboard}">
                             <i class="fas fa-tachometer-alt"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link  text-white" th:href="@{/admin/courses}">
+                        <a class="nav-link text-white"
+                           th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/courses')} ? ' active' : ''"
+                           th:href="@{/admin/courses}">
                             <i class="fas fa-book"></i> Khóa học
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link  text-white" th:href="@{/admin/users}">
+
+                        <a class="nav-link text-white"
+                           th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/users')} ? ' active' : ''"
+                           th:href="@{/admin/users}">
                             <i class="fas fa-users"></i> Người dùng
                         </a>
                     </li>

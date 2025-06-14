@@ -40,10 +40,8 @@ public class CourseController {
             @RequestParam(defaultValue = "5") int size,
             Model model,
             HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        if (user == null || !user.getRole().name().equals("ADMIN")) {
-            return "redirect:/auth/login";
-        }
+        String result = checkAdminRole(session);
+        if (result != null) return result;
 
         prepareCourseList(model, name, sortDirection, page, size);
 
@@ -124,10 +122,8 @@ public class CourseController {
 
     @GetMapping("/delete/{id}")
     public String deleteCourse(@PathVariable("id") int id, HttpSession session, RedirectAttributes redirectAttributes) {
-        User user = (User) session.getAttribute("user");
-        if (user == null || !user.getRole().name().equals("ADMIN")) {
-            return "redirect:/auth/login";
-        }
+        String result = checkAdminRole(session);
+        if (result != null) return result;
 
         if (courseService.checkHasStudents(id)) {
             redirectAttributes.addFlashAttribute("error", "Khóa học đang có sinh viên, không thể xóa!");
@@ -165,5 +161,14 @@ public class CourseController {
     private String normalizeName(String name) {
         if (name == null) return null;
         return name.trim().replaceAll("\\s+", " ").toLowerCase();
+    }
+
+    private String checkAdminRole(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null || !user.getRole().name().equals("ADMIN")) {
+            return "redirect:/auth/login";
+        }
+
+        return null;
     }
 }
