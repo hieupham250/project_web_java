@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div id="alert-container" style="position: fixed; top: 88px; right: 36px; z-index: 9999; min-width: 300px;">
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert" th:text="${error}"></div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-warning">List Course</h2>
+        <form id="searchForm" class="d-flex" method="get" th:action="@{/home/courses}">
+            <input class="form-control me-2" type="search" placeholder="Tìm khóa học theo tên" aria-label="Search" name="name"
+                   th:value="${name}" id="searchInput">
+        </form>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+        <div class="col" th:each="course : ${courses}">
+            <div class="card course-card h-100 shadow-sm p-3">
+                <img th:src="${course.image}" class="card-img-top" th:alt="${course.name}">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <h6 class="text-danger" th:text="${course.name}"></h6>
+                        <p class="text-success fw-bold">Let's explore</p>
+                        <p><strong>Duration:</strong> <span th:text="${course.duration} + ' hour'"></span></p>
+                        <p><strong>Instructor:</strong> <span th:text="${course.instructor}"></span></p>
+                    </div>
+                    <button class="btn btn-success mt-2 btn-register"
+                            th:attr="data-course-id=${course.id}">
+                        Register
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav aria-label="Page navigation example" class="d-flex justify-content-center mt-4">
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/home/courses(page=${currentPage - 1}, size=${size}, name=${name}, sortDirection=${sortDirection})}"
+                   aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item" th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
+                th:classappend="${pageNum == currentPage} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/home/courses(page=${pageNum}, size=${size}, name=${name}, sortDirection=${sortDirection})}"
+                   th:text="${pageNum}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/home/courses(page=${currentPage + 1}, size=${size}, name=${name}, sortDirection=${sortDirection})}"
+                   aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Modal Xác Nhận -->
+    <div class="modal fade" id="confirmRegisterModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="registerForm" method="post" action="/home/register">
+                    <input type="hidden" name="courseId" id="registerCourseId">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm Registration</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Do you want to register for this course?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" id="confirmRegisterBtn" class="btn btn-primary">Confirm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<script th:inline="javascript">
+    const searchInput = document.getElementById('searchInput');
+    const searchForm = document.getElementById('searchForm');
+
+    let typingTimer;
+    const doneTypingInterval = 500;
+
+    searchInput.addEventListener('input', () => {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(() => {
+            searchForm.submit();
+        }, doneTypingInterval);
+    });
+
+    setTimeout(function() {
+        const container = document.getElementById('alert-container');
+        if (container) {
+            container.style.transition = 'opacity 0.5s ease';
+            container.style.opacity = '0';
+            setTimeout(function() {
+                container.style.display = 'none';
+            }, 500); // chờ hiệu ứng fade-out
+        }
+    }, 3000);
+
+    const registerButtons = document.querySelectorAll('.btn-register');
+    const registerCourseIdInput = document.getElementById('registerCourseId');
+    const confirmRegisterModal = new bootstrap.Modal(document.getElementById('confirmRegisterModal'));
+
+    registerButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const courseId = button.getAttribute('data-course-id');
+            registerCourseIdInput.value = courseId;
+            confirmRegisterModal.show();
+        });
+    });
+</script>
+</body>
+</html>

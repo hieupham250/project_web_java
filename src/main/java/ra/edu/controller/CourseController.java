@@ -46,7 +46,7 @@ public class CourseController {
         prepareCourseList(model, name, sortDirection, page, size);
 
         model.addAttribute("courseDTO", new CourseDTO());
-        return "admin";
+        return "admin/admin";
     }
 
     @PostMapping
@@ -81,7 +81,7 @@ public class CourseController {
             name = null;
             prepareCourseList(model, name, sortDirection, page, size);
             model.addAttribute("showFormModal", true);
-            return "admin";
+            return "admin/admin";
         }
 
         Course course = new Course();
@@ -155,7 +155,7 @@ public class CourseController {
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("name", name);
         model.addAttribute("sortDirection", sortDirection);
-        model.addAttribute("content", "listCourse");
+        model.addAttribute("content", "admin/listCourse");
     }
 
     private String normalizeName(String name) {

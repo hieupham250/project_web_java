@@ -3,10 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Danh sách khóa học</title>
-    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.2/css/bootstrap.min.css}" />
-    <link th:rel="stylesheet" th:href="@{/webjars/font-awesome/5.15.4/css/all.css}" />
-    <script th:src="@{/webjars/jquery/3.6.3/jquery.min.js}"></script>
-    <script th:src="@{/webjars/bootstrap/5.2.2/js/bootstrap.bundle.min.js}"></script>
 </head>
 <body>
     <div id="alert-container" style="position: fixed; top: 88px; right: 36px; z-index: 9999; min-width: 300px;">
@@ -96,7 +92,7 @@
     </div>
 
 <!--    phần hiện modal thêm sửa khóa học -->
-    <div th:replace="formCourse :: formCourseModal"></div>
+    <div th:replace="admin/formCourse :: formCourseModal"></div>
 
     <!-- Modal Xác nhận Xóa -->
     <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">

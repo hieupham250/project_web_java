@@ -3,56 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.2/css/bootstrap.min.css}" />
+    <link th:rel="stylesheet" th:href="@{/webjars/font-awesome/5.15.4/css/all.css}" />
+    <script th:src="@{/webjars/jquery/3.6.3/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/5.2.2/js/bootstrap.bundle.min.js}"></script>
+
+    <style>
+        body {
+            background-color: #fafafa;
+        }
+
+        .course-card {
+            transition: transform 0.3s;
+        }
+
+        .course-card:hover {
+            transform: scale(1.03);
+        }
+
+        .btn-register {
+            width: 100%;
+        }
+
+        .navbar-brand img {
+            max-height: 40px;
+        }
+
+        .active {
+            color: #007aff !important;
+        }
+    </style>
 </head>
 <body>
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-warning">List Course</h2>
-        <form class="d-flex" method="get" th:action="@{/courses}">
-            <input class="form-control me-2" type="text" name="search" placeholder="Search..." th:value="${search}">
-            <button class="btn btn-primary">Search</button>
-        </form>
-    </div>
-
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
-        <div class="col" th:each="course : ${courses}">
-            <div class="card course-card h-100 shadow-sm">
-                <img th:src="${course.image}" class="card-img-top" th:alt="${course.name}"
-                     onerror="this.src='https://via.placeholder.com/300x150';">
-                <div class="card-body d-flex flex-column justify-content-between">
-                    <div>
-                        <h6 class="text-danger" th:text="${course.name}"></h6>
-                        <p class="text-success">Let's explore</p>
-                        <p><strong>Duration:</strong> <span th:text="${course.duration} + ' hour'"></span></p>
-                        <p><strong>Instructor:</strong> <span th:text="${course.instructor}"></span></p>
-                    </div>
-                    <button class="btn btn-success mt-2 btn-register">
-                        Register
-                    </button>
-                </div>
-            </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm px-4 py-2 sticky-top justify-content-between">
+        <a class="navbar-brand d-flex align-items-center" href="/home/courses">
+            <img src="https://jbagy.me/wp-content/uploads/2025/03/Hinh-anh-avatar-nam-cute-2.jpg" alt="Logo">
+        </a>
+        <div class="d-flex">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" th:classappend="${#httpServletRequest.requestURI.startsWith('/home/courses')} ? ' active' : ''" th:href="@{/home/courses}">List Course</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" th:classappend="${#httpServletRequest.requestURI.startsWith('/home/enrollments')} ? ' active' : ''" th:href="@{/home/enrollments}">Enrollments</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" th:classappend="${#httpServletRequest.requestURI.startsWith('/home/profile')} ? ' active' : ''" th:href="@{/home/profile}">Profile</a>
+                </li>
+            </ul>
         </div>
-    </div>
-
-    <nav aria-label="Page navigation example" class="d-flex justify-content-center">
-        <ul class="pagination">
-            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                <a class="page-link" th:href="@{/admin/courses(page=${currentPage - 1}, size=${size}, name=${name}, sortDirection=${sortDirection})}" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-            <li class="page-item" th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
-                th:classappend="${pageNum == currentPage} ? 'active'">
-                <a class="page-link" th:href="@{/admin/courses(page=${pageNum}, size=${size}, name=${name}, sortDirection=${sortDirection})}"
-                   th:text="${pageNum}">1</a>
-            </li>
-            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
-                <a class="page-link" th:href="@{/admin/courses(page=${currentPage + 1}, size=${size}, name=${name}, sortDirection=${sortDirection})}" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-        </ul>
+        <div class="d-flex gap-3 align-items-center">
+            <a href="#" class="text-dark"><i class="bi bi-bell fs-5"></i></a>
+            <img src="https://jbagy.me/wp-content/uploads/2025/03/Hinh-anh-avatar-nam-cute-2.jpg" alt="User" width="32" height="32" class="rounded-circle">
+            <form th:action="@{/logout}" method="post">
+                <button class="btn btn-outline-secondary btn-sm">Logout</button>
+            </form>
+        </div>
     </nav>
+
+<div class="container py-4">
+    <div th:replace="${content}"></div>
 </div>
 </body>
 </html>

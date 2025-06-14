@@ -21,6 +21,6 @@ public class AdminController {
         if (user == null || !user.getRole().name().equals("ADMIN")) {
             return "redirect:/auth/login";
         }
-        return "admin";
+        return "admin/admin";
     }
 }
