@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lịch sử đăng ký khóa học</title>
+</head>
+<body>
+<div th:fragment="enrollments">
+    <div id="alert-container" style="position: fixed; top: 88px; right: 36px; z-index: 9999; min-width: 300px;">
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert" th:text="${error}"></div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-warning">History Enrollment</h2>
+        <form id="searchForm" class="d-flex" method="get" th:action="@{/home/enrollments}">
+            <input class="form-control me-2" type="search" placeholder="Tìm khóa học theo tên" aria-label="Search" name="name"
+                   th:value="${name}" id="searchInput">
+
+            <select class="form-select me-2" name="status" style="width: 170px;" id="filterStatus">
+                <option th:value="${null}">Tất cả trạng thái</option>
+                <option th:each="s : ${statusList}"
+                        th:value="${s}"
+                        th:text="${s}"
+                        th:selected="${s.toString() == status}"></option>
+            </select>
+        </form>
+    </div>
+
+    <table class="table table-bordered table-hover">
+        <thead class="text-bg-primary text-center">
+        <tr>
+            <th scope="col">STT</th>
+            <th scope="col">Tên khóa học</th>
+            <th scope="col">Thời lượng</th>
+            <th scope="col">Giảng viên</th>
+            <th scope="col">Hình ảnh</th>
+            <th scope="col">Ngày đăng ký</th>
+            <th scope="col">Trạng thái</th>
+            <th scope="col">Chức năng</th>
+        </tr>
+        </thead>
+        <tbody th:if="${#lists.isEmpty(enrollments) == false}">
+        <tr th:each="enrollment, iterStat : ${enrollments}">
+            <td th:text="${iterStat.count}"></td>
+            <td th:text="${enrollment.courseName}"></td>
+            <td th:text="|${enrollment.duration} giờ|"></td>
+            <td th:text="${enrollment.instructor}"></td>
+            <td>
+                <img th:src="${enrollment.image}" alt="Ảnh khóa học" width="100">
+            </td>
+            <td th:text="${enrollment.registeredAt}"></td>
+            <td>
+                <span th:switch="${enrollment.status.toString()}">
+                    <span th:case="'WAITING'" class="badge text-bg-warning">Chờ xử lý</span>
+                    <span th:case="'CONFIRM'" class="badge text-bg-success">Đã xác nhận</span>
+                    <span th:case="'CANCEL'" class="badge text-bg-secondary">Đã hủy</span>
+                    <span th:case="'DENIED'" class="badge text-bg-danger">Bị từ chối</span>
+                 </span>
+            </td>
+            <td>
+                <button class="btn btn-sm btn-danger btn-cancel-enrollment"
+                        th:if="${enrollment.status.toString() == 'WAITING'}"
+                        th:attr="data-url=@{/home/enrollments/cancel(id=${enrollment.id})}">
+                    Hủy đăng ký
+                </button>
+            </td>
+        </tr>
+        </tbody>
+
+        <tbody th:if="${#lists.isEmpty(enrollments)}">
+        <tr>
+            <td colspan="7" class="text-center">Không có dữ liệu để hiển thị</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <nav aria-label="Page navigation example" class="d-flex justify-content-end" th:if="${#lists.isEmpty(enrollments) == false}">
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/home/enrollments(page=${currentPage - 1}, size=${size}, name=${name}, status=${status})}"
+                   aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item"
+                th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
+                th:classappend="${pageNum == currentPage} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/home/enrollments(page=${pageNum}, size=${size}, name=${name}, status=${status})}"
+                   th:text="${pageNum}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/home/enrollments(page=${currentPage + 1}, size=${size}, name=${name}, status=${status})}"
+                   aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<!-- Modal Xác Nhận Hủy Đăng Ký -->
+<div class="modal fade" id="cancelEnrollmentModal" tabindex="-1" aria-labelledby="cancelEnrollmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="cancelEnrollmentModalLabel">Xác nhận hủy đăng ký</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc chắn muốn <strong>hủy đăng ký</strong> khóa học này không?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <a id="confirmCancelEnrollmentBtn" class="btn btn-danger">Xác nhận hủy</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const searchInput = document.getElementById('searchInput');
+    const filterStatus = document.getElementById('filterStatus')
+    const searchForm = document.getElementById('searchForm');
+
+    let typingTimer;
+    const doneTypingInterval = 500;
+
+    searchInput.addEventListener('input', () => {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(() => {
+            searchForm.submit();
+        }, doneTypingInterval);
+    });
+
+    filterStatus.addEventListener('change', () => {
+        searchForm.submit();
+    });
+
+    setTimeout(function() {
+        const container = document.getElementById('alert-container');
+        if (container) {
+            container.style.transition = 'opacity 0.5s ease';
+            container.style.opacity = '0';
+            setTimeout(function() {
+                container.style.display = 'none';
+            }, 500); // chờ hiệu ứng fade-out
+        }
+    }, 3000);
+
+    const cancelEnrollmentModal = new bootstrap.Modal(document.getElementById('cancelEnrollmentModal'));
+    const confirmCancelEnrollmentBtn = document.getElementById('confirmCancelEnrollmentBtn');
+
+    document.querySelectorAll('.btn-cancel-enrollment').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const url = btn.getAttribute('data-url');
+            confirmCancelEnrollmentBtn.setAttribute('href', url);
+
+            // Hiển thị modal
+            cancelEnrollmentModal.show();
+        });
+    });
+</script>
+</body>
+</html>

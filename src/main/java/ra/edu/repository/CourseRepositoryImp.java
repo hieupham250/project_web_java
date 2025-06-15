@@ -86,27 +86,6 @@ public class CourseRepositoryImp implements CourseRepository {
     }
 
     @Override
-    public List<Course> findByIds(List<Integer> ids) {
-        if (ids == null || ids.isEmpty()) {
-            return List.of();
-        }
-
-        Session session = sessionFactory.openSession();
-
-        try {
-            Query<Course> query = session.createQuery(
-                    "FROM Course c WHERE c.id IN (:ids)", Course.class);
-            query.setParameter("ids", ids);
-            return query.list();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return List.of();
-        } finally {
-            session.close();
-        }
-    }
-
-    @Override
     public boolean existsByName(String name) {
         Session session = sessionFactory.openSession();
 

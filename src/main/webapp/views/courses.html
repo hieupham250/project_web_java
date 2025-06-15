@@ -5,6 +5,7 @@
     <title>Title</title>
 </head>
 <body>
+<div th:fragment="courses">
     <div id="alert-container" style="position: fixed; top: 88px; right: 36px; z-index: 9999; min-width: 300px;">
         <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert" th:text="${success}"></div>
         <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert" th:text="${error}"></div>
@@ -37,6 +38,7 @@
             </div>
         </div>
     </div>
+
     <div th:if="${#lists.isEmpty(courses)}" class="text-center">
         <h4 class="text-muted">Không có khóa học nào để hiển thị</h4>
     </div>
@@ -65,6 +67,7 @@
             </li>
         </ul>
     </nav>
+</div>
 
     <!-- Modal Xác Nhận -->
     <div class="modal fade" id="confirmRegisterModal" tabindex="-1" aria-hidden="true">

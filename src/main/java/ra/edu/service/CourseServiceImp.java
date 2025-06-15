@@ -28,11 +28,6 @@ public class CourseServiceImp implements CourseService {
     }
 
     @Override
-    public List<Course> findByIds(List<Integer> ids) {
-        return courseRepository.findByIds(ids);
-    }
-
-    @Override
     public boolean existsByName(String name) {
         return courseRepository.existsByName(name);
     }

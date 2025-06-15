@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import ra.edu.datatype.Role;
 import ra.edu.datatype.StatusEnrollment;
+import ra.edu.dto.EnrollmentConvertDTO;
 import ra.edu.entity.Course;
 import ra.edu.entity.Enrollment;
 import ra.edu.entity.User;
@@ -17,6 +19,8 @@ import ra.edu.service.EnrollmentService;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -73,6 +77,57 @@ public class HomeController {
         redirectAttributes.addFlashAttribute("success", "Đăng ký khóa học thành công!");
 
         return "redirect:/home/courses";
+    }
+
+    // ====== Phần xem lịch sử đăng ký ==========
+    @GetMapping("enrollments")
+    public String enrollments(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) StatusEnrollment status,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int size,
+            Model model,
+            HttpSession session,
+            RedirectAttributes redirectAttributes
+    ) {
+        User user = checkLogin(session);
+        if (user == null) {
+            redirectAttributes.addFlashAttribute("error", "Bạn chưa đăng nhập!");
+            return "redirect:/home/courses";
+        }
+        int userId = 0; // mặc định admin
+        if (user.getRole() != Role.ADMIN) {
+            userId = user.getId();
+        }
+
+        List<Enrollment> enrollments = enrollmentService.findAll(name, status, userId, page, size);
+        long totalEnrollment = enrollmentService.countWithFilter(name, status, userId);
+        int totalPages = (int) Math.ceil((double) totalEnrollment / size);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy");
+
+        List<EnrollmentConvertDTO> newEnrollments = new ArrayList<>();
+        for (Enrollment enrollment : enrollments) {
+            EnrollmentConvertDTO enrollmentConvertDTO = new EnrollmentConvertDTO();
+            enrollmentConvertDTO.setId(enrollment.getId());
+            enrollmentConvertDTO.setCourseName(enrollment.getCourse().getName());
+            enrollmentConvertDTO.setInstructor(enrollment.getCourse().getInstructor());
+            enrollmentConvertDTO.setDuration(enrollment.getCourse().getDuration());
+            enrollmentConvertDTO.setImage(enrollment.getCourse().getImage());
+            enrollmentConvertDTO.setRegisteredAt(formatter.format(enrollment.getRegistered_at()));
+            enrollmentConvertDTO.setStatus(enrollment.getStatus());
+            newEnrollments.add(enrollmentConvertDTO);
+        }
+
+        model.addAttribute("enrollments", newEnrollments);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("name", name);
+        model.addAttribute("status", status);
+        model.addAttribute("statusList", StatusEnrollment.values());
+        model.addAttribute("content", "enrollments");
+
+        return "home";
     }
 
     private User checkLogin(HttpSession session) {
