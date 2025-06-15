@@ -53,14 +53,14 @@ public class HomeController {
         User user = checkLogin(session);
 
         if (user == null) {
-            redirectAttributes.addFlashAttribute("error", "Bạn chưa đăng nhập");
+            redirectAttributes.addFlashAttribute("error", "Bạn chưa đăng nhập!");
             return "redirect:/home/courses";
         }
 
         boolean isRegistered = enrollmentService.checkEnrollment(user.getId(), courseId);
 
         if (isRegistered) {
-            redirectAttributes.addFlashAttribute("error", "Bạn đã đăng ký khóa học này");
+            redirectAttributes.addFlashAttribute("error", "Bạn đã đăng ký khóa học này!");
             return "redirect:/home/courses";
         }
         Enrollment enrollment = new Enrollment();
@@ -70,7 +70,7 @@ public class HomeController {
         enrollment.setStatus(StatusEnrollment.WAITING);
         enrollmentService.create(enrollment);
 
-        redirectAttributes.addFlashAttribute("success", "Đăng ký khóa học thành công");
+        redirectAttributes.addFlashAttribute("success", "Đăng ký khóa học thành công!");
 
         return "redirect:/home/courses";
     }

@@ -38,13 +38,13 @@ public class CourseServiceImp implements CourseService {
     }
 
     @Override
-    public void create(Course course) {
-        courseRepository.create(course);
+    public boolean create(Course course) {
+       return courseRepository.create(course);
     }
 
     @Override
-    public void update(Course course) {
-        courseRepository.update(course);
+    public boolean update(Course course) {
+        return courseRepository.update(course);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class CourseServiceImp implements CourseService {
     }
 
     @Override
-    public void delete(int id) {
-        courseRepository.delete(id);
+    public boolean delete(int id) {
+         return courseRepository.delete(id);
     }
 }

@@ -8,6 +8,10 @@
     <script th:src="@{/webjars/jquery/3.6.3/jquery.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/5.2.2/js/bootstrap.bundle.min.js}"></script>
     <style>
+        .navbar-brand img {
+            max-height: 40px;
+        }
+
         .sidebar .nav-link:hover {
             background-color: #6c757d;
             color: white !important;
@@ -20,47 +24,70 @@
     </style>
 </head>
 <body>
-<div class="container-fluid">
-    <div class="row min-vh-100">
-        <nav class="col-md-2 d-none d-md-block bg-dark sidebar py-4">
-            <div class="position-sticky">
-                <h5 class="text-center text-white">Quản trị</h5>
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link text-white"
-                           th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/dashboard')} ? ' active' : ''"
-                           th:href="@{/admin/dashboard}">
-                            <i class="fas fa-tachometer-alt"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white"
-                           th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/courses')} ? ' active' : ''"
-                           th:href="@{/admin/courses}">
-                            <i class="fas fa-book"></i> Khóa học
-                        </a>
-                    </li>
-                    <li class="nav-item">
 
-                        <a class="nav-link text-white"
-                           th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/users')} ? ' active' : ''"
-                           th:href="@{/admin/users}">
-                            <i class="fas fa-users"></i> Người dùng
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link  text-white" th:href="@{/logout}">
-                            <i class="fas fa-sign-out-alt"></i> Đăng xuất
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm px-4 py-2 sticky-top justify-content-between">
+        <a class="navbar-brand d-flex align-items-center" href="/admin/dashboard">
+            <img src="https://jbagy.me/wp-content/uploads/2025/03/Hinh-anh-avatar-nam-cute-2.jpg" alt="Logo">
+        </a>
+        <div class="d-flex gap-3 align-items-center">
+            <a href="#" class="text-dark position-relative">
+                <i class="fas fa-envelope fa-lg"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                3
+            </span>
+            </a>
+            <a href="#" class="text-dark position-relative">
+                <i class="fas fa-bell fa-lg"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                5
+            </span>
+            </a>
+            <img src="https://jbagy.me/wp-content/uploads/2025/03/Hinh-anh-avatar-nam-cute-2.jpg" alt="User" width="32" height="32" class="rounded-circle">
+            <a th:href="@{/auth/logout}" class="btn btn-outline-secondary btn-sm">Logout</a>
+        </div>
+    </nav>
 
-        <main class="col-md-10 ms-sm-auto px-md-4 py-4 bg-body-tertiary">
-            <div th:replace="${content}"></div>
-        </main>
+    <div class="container-fluid">
+        <div class="row min-vh-100">
+            <nav class="col-md-2 d-none d-md-block bg-dark sidebar py-4">
+                <div class="position-sticky">
+                    <h5 class="text-center text-white">Quản trị</h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link text-white"
+                               th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/dashboard')} ? ' active' : ''"
+                               th:href="@{/admin/dashboard}">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white"
+                               th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/courses')} ? ' active' : ''"
+                               th:href="@{/admin/courses}">
+                                <i class="fas fa-book"></i> Khóa học
+                            </a>
+                        </li>
+                        <li class="nav-item">
+
+                            <a class="nav-link text-white"
+                               th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/users')} ? ' active' : ''"
+                               th:href="@{/admin/users}">
+                                <i class="fas fa-users"></i> Người dùng
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link  text-white" th:href="@{/logout}">
+                                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <main class="col-md-10 ms-sm-auto px-md-4 py-4 bg-body-tertiary">
+                <div th:replace="${content}"></div>
+            </main>
+        </div>
     </div>
-</div>
 </body>
 </html>

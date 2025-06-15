@@ -10,8 +10,8 @@ public interface CourseService {
     Course findById(int id);
     List<Course> findByIds(List<Integer> ids);
     boolean existsByName(String name);
-    void create(Course course);
-    void update(Course course);
+    boolean create(Course course);
+    boolean update(Course course);
     boolean checkHasStudents(int courseId);
-    void delete(int id);
+    boolean delete(int id);
 }

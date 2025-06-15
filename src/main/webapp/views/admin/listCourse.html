@@ -41,7 +41,7 @@
                 <th scope="col">Chức năng</th>
             </tr>
             </thead>
-            <tbody>
+            <tbody th:if="${#lists.isEmpty(courses) == false}">
                 <tr th:each="course, iterStat : ${courses}">
                     <td th:text="${iterStat.count}"></td>
                     <td th:text="${course.name}"></td>
@@ -69,8 +69,14 @@
                     </td>
                 </tr>
             </tbody>
+
+            <tbody th:if="${#lists.isEmpty(courses)}">
+            <tr>
+                <td colspan="7" class="text-center">Không có dữ liệu để hiển thị</td>
+            </tr>
+            </tbody>
         </table>
-        <nav aria-label="Page navigation example" class="d-flex justify-content-end">
+        <nav aria-label="Page navigation example" class="d-flex justify-content-end" th:if="${#lists.isEmpty(courses) == false}">
             <ul class="pagination">
                 <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
                     <a class="page-link" th:href="@{/admin/courses(page=${currentPage - 1}, size=${size}, name=${name}, sortDirection=${sortDirection})}" aria-label="Previous">

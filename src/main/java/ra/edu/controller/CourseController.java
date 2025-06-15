@@ -110,11 +110,18 @@ public class CourseController {
         }
 
         if (isUpdate) {
-            courseService.update(course);
-            redirectAttributes.addFlashAttribute("success", "Cập nhật khóa học thành công!");
+            if (courseService.update(course)) {
+                redirectAttributes.addFlashAttribute("success", "Cập nhật khóa học thành công!");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Cập nhật khóa học thất bại!");
+            }
+
         } else {
-            courseService.create(course);
-            redirectAttributes.addFlashAttribute("success", "Thêm khóa học thành công!");
+            if (courseService.create(course)) {
+                redirectAttributes.addFlashAttribute("success", "Thêm khóa học thành công!");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Thêm khóa học thất bại!");
+            }
         }
 
         return "redirect:/admin/courses";
@@ -129,8 +136,13 @@ public class CourseController {
             redirectAttributes.addFlashAttribute("error", "Khóa học đang có sinh viên, không thể xóa!");
             return "redirect:/admin/courses";
         }
-        redirectAttributes.addFlashAttribute("success", "Xóa khóa học thành công!");
-        courseService.delete(id);
+
+        if (courseService.delete(id)) {
+            redirectAttributes.addFlashAttribute("success", "Xóa khóa học thành công!");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Xóa khóa học thất bại!");
+        }
+
         return "redirect:/admin/courses";
     }
 

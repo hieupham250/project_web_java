@@ -78,13 +78,22 @@ public class AuthController {
 
         if (user.getStatus() == StatusAccount.ACTIVE) {
             session.setAttribute("user", user);
-            redirectAttributes.addFlashAttribute("message", "Đăng nhập thành công!");
+            redirectAttributes.addFlashAttribute("success", "Đăng nhập thành công!");
             if (user.getRole() == Role.ADMIN) {
                 return "redirect:/admin";
             } else {
                 return "redirect:/home/courses";
             }
+        } else if (user.getStatus() == StatusAccount.BLOCKED) {
+            redirectAttributes.addFlashAttribute("error", "Tài khoản của bạn đã bị khóa!");
         }
         return "login";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session, RedirectAttributes redirectAttributes) {
+        session.invalidate();
+        redirectAttributes.addFlashAttribute("success", "Đăng xuất thành công!");
+        return "redirect:/home/courses";
     }
 }

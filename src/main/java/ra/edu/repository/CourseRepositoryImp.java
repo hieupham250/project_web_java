@@ -17,40 +17,72 @@ public class CourseRepositoryImp implements CourseRepository {
     @Override
     public List<Course> findAll(String keyword, String sortDirection, int page, int size) {
         Session session = sessionFactory.openSession();
-        StringBuilder hql = new StringBuilder("FROM Course c WHERE 1=1");
+        try {
+            StringBuilder hql = new StringBuilder("FROM Course c WHERE 1=1");
 
-        if (keyword != null && !keyword.trim().isEmpty()) hql.append(" AND c.name LIKE :keyword");
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                hql.append(" AND lower(c.name) LIKE :keyword");
+            }
 
-        if ("asc".equalsIgnoreCase(sortDirection)) {
-            hql.append(" ORDER BY c.name ASC");
-        } else if ("desc".equalsIgnoreCase(sortDirection)) {
-            hql.append(" ORDER BY c.name DESC");
+            if ("asc".equalsIgnoreCase(sortDirection)) {
+                hql.append(" ORDER BY c.name ASC");
+            } else if ("desc".equalsIgnoreCase(sortDirection)) {
+                hql.append(" ORDER BY c.name DESC");
+            }
+
+            Query<Course> query = session.createQuery(hql.toString(), Course.class);
+
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                query.setParameter("keyword", "%" + keyword.toLowerCase() + "%");
+            }
+
+            return query.setFirstResult((page - 1) * size)
+                    .setMaxResults(size)
+                    .list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of(); // trả về danh sách rỗng nếu lỗi
+        } finally {
+            session.close();
         }
-
-        Query<Course> query = session.createQuery(hql.toString(), Course.class);
-        if (keyword != null && !keyword.trim().isEmpty()) query.setParameter("keyword", "%" + keyword.toLowerCase() + "%");
-
-        return query.setFirstResult((page - 1) * size).setMaxResults(size).list();
     }
 
     @Override
     public long countWithFilter(String keyword) {
         Session session = sessionFactory.openSession();
-        StringBuilder hql = new StringBuilder("SELECT COUNT(c.id) FROM Course c WHERE 1=1");
 
-        if (keyword != null && !keyword.trim().isEmpty()) hql.append(" AND c.name LIKE :keyword");
+        try {
+            StringBuilder hql = new StringBuilder("SELECT COUNT(c.id) FROM Course c WHERE 1=1");
 
-        Query<Long> query = session.createQuery(hql.toString(), Long.class);
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                hql.append(" AND c.name LIKE :keyword");
+            }
 
-        if (keyword != null && !keyword.trim().isEmpty()) query.setParameter("keyword", "%" + keyword.toLowerCase() + "%");
+            Query<Long> query = session.createQuery(hql.toString(), Long.class);
 
-        return query.uniqueResult();
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                query.setParameter("keyword", "%" + keyword.toLowerCase() + "%");
+            }
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        } finally {
+            session.close();
+        }
     }
 
     @Override
     public Course findById(int id) {
         Session session = sessionFactory.openSession();
-        return session.get(Course.class, id);
+        try {
+            return session.get(Course.class, id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            session.close();
+        }
     }
 
     @Override
@@ -60,53 +92,115 @@ public class CourseRepositoryImp implements CourseRepository {
         }
 
         Session session = sessionFactory.openSession();
-        Query<Course> query = session.createQuery("FROM Course c WHERE c.id in (:ids)", Course.class);
-        query.setParameter("ids", ids);
-        return query.list();
+
+        try {
+            Query<Course> query = session.createQuery(
+                    "FROM Course c WHERE c.id IN (:ids)", Course.class);
+            query.setParameter("ids", ids);
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of();
+        } finally {
+            session.close();
+        }
     }
 
     @Override
     public boolean existsByName(String name) {
         Session session = sessionFactory.openSession();
-        Query<Long> query = session.createQuery(
-                "SELECT COUNT(c.id) FROM Course c WHERE lower(c.name) = :name", Long.class);
-        query.setParameter("name", name.toLowerCase());
 
-        Long count = query.uniqueResult();
-        return count != null && count > 0;
+        try {
+            Query<Long> query = session.createQuery(
+                    "SELECT COUNT(c.id) FROM Course c WHERE lower(c.name) = :name", Long.class);
+            query.setParameter("name", name.toLowerCase());
+
+            Long count = query.uniqueResult();
+            return count != null && count > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 
     @Override
-    public void create(Course course) {
+    public boolean create(Course course) {
         Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        session.save(course);
-        session.getTransaction().commit();
+
+        try {
+            session.beginTransaction();
+            session.save(course);
+            session.getTransaction().commit();
+            return true;
+        } catch (Exception e) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 
     @Override
-    public void update(Course course) {
+    public boolean update(Course course) {
         Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        session.update(course);
-        session.getTransaction().commit();
+
+        try {
+            session.beginTransaction();
+            session.update(course);
+            session.getTransaction().commit();
+            return true;
+        } catch (Exception e) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 
     @Override
     public boolean checkHasStudents(int courseId) {
         Session session = sessionFactory.openSession();
-        Query<Long> query = session.createQuery("SELECT COUNT(e.id) FROM Enrollment e WHERE e.course.id = :courseId", Long.class);
-        query.setParameter("courseId", courseId);
-        return query.uniqueResult() > 0;
+
+        try {
+            Query<Long> query = session.createQuery(
+                    "SELECT COUNT(e.id) FROM Enrollment e WHERE e.course.id = :courseId", Long.class);
+            query.setParameter("courseId", courseId);
+            return query.uniqueResult() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 
     @Override
-    public void delete(int id) {
+    public boolean delete(int id) {
         Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        Course course = session.get(Course.class, id);
-        if(course == null) return;
-        session.delete(course);
-        session.getTransaction().commit();
+
+        try {
+            session.beginTransaction();
+            Course course = session.get(Course.class, id);
+            if (course == null) return false;
+            session.delete(course);
+            session.getTransaction().commit();
+            return true;
+        } catch (Exception e) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 }
