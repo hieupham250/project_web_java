@@ -70,14 +70,9 @@
                         <li class="nav-item">
 
                             <a class="nav-link text-white"
-                               th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/users')} ? ' active' : ''"
-                               th:href="@{/admin/users}">
-                                <i class="fas fa-users"></i> Người dùng
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link  text-white" th:href="@{/logout}">
-                                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                               th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/students')} ? ' active' : ''"
+                               th:href="@{/admin/students}">
+                                <i class="fas fa-users"></i> Học viên
                             </a>
                         </li>
                     </ul>

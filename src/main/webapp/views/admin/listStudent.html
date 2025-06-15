@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div id="alert-container" style="position: fixed; top: 88px; right: 36px; z-index: 9999; min-width: 300px;">
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert" th:text="${error}"></div>
+    </div>
+
+    <div class="container bg-white" th:fragment="listStudent">
+        <h2 class="mb-4">Danh sách khóa học</h2>
+
+        <div class="mb-4 d-flex justify-content-between align-items-center">
+            <form id="searchForm" class="d-flex" th:action="@{/admin/students}" method="get">
+                <input class="form-control me-2" type="search" placeholder="Tìm khóa học theo tên" aria-label="Search" name="name"
+                       th:value="${name}" id="searchInput">
+                <select class="form-select me-2" name="sortDirection" style="width: 170px;" id="sortSelect">
+                    <option th:value="${null}" th:selected="${sortDirection == null}">Sắp xếp theo tên</option>
+                    <option th:value="asc" th:selected="${sortDirection == 'asc'}">Tăng dần</option>
+                    <option th:value="desc" th:selected="${sortDirection == 'desc'}">Giảm dần</option>
+                </select>
+                <input type="hidden" name="page" th:value="${currentPage}" />
+                <input type="hidden" name="size" th:value="${size}" />
+            </form>
+        </div>
+
+        <table class="table table-bordered table-hover">
+            <thead class="text-bg-primary text-center">
+            <tr>
+                <th>STT</th>
+                <th>Họ tên</th>
+                <th>Email</th>
+                <th>Ngày sinh</th>
+                <th>Giới tính</th>
+                <th>Số điện thoại</th>
+                <th>Trạng thái</th>
+                <th>Chức năng</th>
+            </tr>
+            </thead>
+            <tbody th:if="${#lists.isEmpty(students) == false}">
+            <tr th:each="student, iterStat : ${students}">
+                <td th:text="${iterStat.count}"></td>
+                <td th:text="${student.name}"></td>
+                <td th:text="${student.email}"></td>
+                <td th:text="${student.dob}"></td>
+                <td th:text="${student.sex} ? 'Nam' : 'Nữ'"></td>
+                <td th:text="${student.phone}"></td>
+                <td th:switch="${student.status.toString()}">
+                    <span th:case="'ACTIVE'" class="badge bg-success">Hoạt động</span>
+                    <span th:case="'INACTIVE'" class="badge bg-danger">Bị chặn</span>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary btn-update-status"
+                            th:attr="data-id=${student.id},
+                            data-current-status=${student.status.toString()},
+                            data-url=@{/admin/students/toggle-status/{id}(id=${student.id})}"
+                            th:style="${student.status.toString() == 'ACTIVE'}
+                                ? 'border-color: #00D936; background-color: #B5FFBD; color: #00D936;'
+                                : 'border-color: #FF9D00; background-color: #FFE3B5; color: #FF9D00;'"
+                            th:text="${student.status.toString() == 'ACTIVE'} ? 'Chặn' : 'Kích hoạt'">
+                        Cập nhật Trạng thái
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+
+            <tbody th:if="${#lists.isEmpty(students)}">
+            <tr>
+                <td colspan="7" class="text-center">Không có dữ liệu để hiển thị</td>
+            </tr>
+            </tbody>
+        </table>
+        <nav aria-label="Page navigation example" class="d-flex justify-content-end" th:if="${#lists.isEmpty(students) == false}">
+            <ul class="pagination">
+                <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                    <a class="page-link" th:href="@{/admin/students(page=${currentPage - 1}, size=${size}, name=${name}, sortDirection=${sortDirection})}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item" th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
+                    th:classappend="${pageNum == currentPage} ? 'active'">
+                    <a class="page-link" th:href="@{/admin/students(page=${pageNum}, size=${size}, name=${name}, sortDirection=${sortDirection})}"
+                       th:text="${pageNum}">1</a>
+                </li>
+                <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                    <a class="page-link" th:href="@{/admin/students(page=${currentPage + 1}, size=${size}, name=${name}, sortDirection=${sortDirection})}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="updateStatusModalLabel">Cập nhật Trạng thái</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    Bạn có chắc chắn muốn <strong id="newStatusLabel"></strong> sinh viên này không?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <a id="confirmUpdateStatusBtn" class="btn btn-primary">Xác nhận</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script th:inline="javascript">
+    const searchInput = document.getElementById('searchInput');
+    const sortSelect = document.getElementById('sortSelect');
+    const searchForm = document.getElementById('searchForm');
+
+    let typingTimer;
+    const doneTypingInterval = 500;
+
+    searchInput.addEventListener('input', () => {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(() => {
+            searchForm.submit();
+        }, doneTypingInterval);
+    });
+
+    sortSelect.addEventListener('change', () => {
+        searchForm.submit();
+    });
+
+    // ==== Xử lý nút Cập nhật Trạng thái ====
+    const updateStatusModal = new bootstrap.Modal(document.getElementById('updateStatusModal'));
+    const confirmUpdateStatusBtn = document.getElementById('confirmUpdateStatusBtn');
+    const newStatusLabel = document.getElementById('newStatusLabel');
+
+    document.querySelectorAll('.btn-update-status').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const id = btn.getAttribute('data-id');
+            const currentStatus = btn.getAttribute('data-current-status');
+            const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+
+            newStatusLabel.innerText = newStatus === 'ACTIVE' ? 'Kích hoạt' : 'Chặn';
+
+            const url = btn.getAttribute('data-url');
+            confirmUpdateStatusBtn.setAttribute('href', url);
+
+            // Hiển thị modal
+            updateStatusModal.show();
+        });
+    });
+
+    setTimeout(function() {
+        const container = document.getElementById('alert-container');
+        if (container) {
+            container.style.transition = 'opacity 0.5s ease';
+            container.style.opacity = '0';
+            setTimeout(function() {
+                container.style.display = 'none';
+            }, 500); // chờ hiệu ứng fade-out
+        }
+    }, 3000);
+</script>
+</body>
+</html>

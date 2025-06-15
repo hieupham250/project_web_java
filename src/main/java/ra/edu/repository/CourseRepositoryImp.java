@@ -21,7 +21,7 @@ public class CourseRepositoryImp implements CourseRepository {
             StringBuilder hql = new StringBuilder("FROM Course c WHERE 1=1");
 
             if (keyword != null && !keyword.trim().isEmpty()) {
-                hql.append(" AND lower(c.name) LIKE :keyword");
+                hql.append(" AND c.name LIKE :keyword");
             }
 
             if ("asc".equalsIgnoreCase(sortDirection)) {

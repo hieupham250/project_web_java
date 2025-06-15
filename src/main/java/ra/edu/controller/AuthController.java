@@ -84,7 +84,7 @@ public class AuthController {
             } else {
                 return "redirect:/home/courses";
             }
-        } else if (user.getStatus() == StatusAccount.BLOCKED) {
+        } else if (user.getStatus() == StatusAccount.INACTIVE) {
             redirectAttributes.addFlashAttribute("error", "Tài khoản của bạn đã bị khóa!");
         }
         return "login";
