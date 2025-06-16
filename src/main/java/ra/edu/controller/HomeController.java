@@ -38,7 +38,8 @@ public class HomeController {
             @RequestParam(required = false) String sortDirection,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "8") int size,
-            Model model) {
+            Model model,
+            HttpSession session) {
         List<Course> courses = courseService.findAll(name, sortDirection, page, size);
         long totalCourse = courseService.countWithFilter(name);
         int totalPages = (int) Math.ceil((double) totalCourse / size);
@@ -47,6 +48,13 @@ public class HomeController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("name", name);
+
+        User user = checkLogin(session);
+        List<Integer> registeredCourseIds = new ArrayList<>();
+        if (user != null) {
+            registeredCourseIds = enrollmentService.findAllCourseIdsByUserId(user.getId());
+        }
+        model.addAttribute("registeredCourseIds", registeredCourseIds);
 
         model.addAttribute("content", "courses");
         return "home";

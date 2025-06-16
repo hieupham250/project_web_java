@@ -31,8 +31,9 @@
                         <p><strong>Instructor:</strong> <span th:text="${course.instructor}"></span></p>
                     </div>
                     <button class="btn btn-success mt-2 btn-register"
-                            th:attr="data-course-id=${course.id}">
-                        Register
+                            th:attr="data-course-id=${course.id}"
+                            th:disabled="${registeredCourseIds.contains(course.id)}"
+                            th:text="${registeredCourseIds.contains(course.id) ? 'Registered' : 'Register >'}">
                     </button>
                 </div>
             </div>

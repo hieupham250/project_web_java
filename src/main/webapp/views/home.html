@@ -52,9 +52,24 @@
                 </li>
             </ul>
         </div>
-        <div class="d-flex gap-3 align-items-center">
+        <div class="d-flex gap-3 align-items-center" th:if="${session.user != null}">
+            <a href="#" class="text-dark position-relative">
+                <i class="fas fa-envelope fa-lg"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    3
+                </span>
+            </a>
+            <a href="#" class="text-dark position-relative">
+                <i class="fas fa-bell fa-lg"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    5
+                </span>
+            </a>
             <img src="https://jbagy.me/wp-content/uploads/2025/03/Hinh-anh-avatar-nam-cute-2.jpg" alt="User" width="32" height="32" class="rounded-circle">
             <a th:href="@{/auth/logout}" class="btn btn-outline-secondary btn-sm">Logout</a>
+        </div>
+        <div th:if="${session.user == null}">
+            <a th:href="@{/auth/login}" class="btn btn-primary btn-sm">Login</a>
         </div>
     </nav>
 

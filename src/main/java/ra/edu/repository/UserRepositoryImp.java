@@ -23,7 +23,7 @@ public class UserRepositoryImp implements UserRepository{
             StringBuilder hql = new StringBuilder("FROM User u WHERE u.role = :role");
 
             if (keyword != null && !keyword.trim().isEmpty()) {
-                hql.append(" AND u.name LIKE :keyword");
+                hql.append(" AND u.name LIKE :keyword OR u.email LIKE :keyword");
             }
 
             if ("asc".equalsIgnoreCase(sortDirection)) {

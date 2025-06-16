@@ -29,6 +29,11 @@ public class EnrollmentServiceImp implements EnrollmentService {
     }
 
     @Override
+    public List<Integer> findAllCourseIdsByUserId(int userId) {
+        return enrollmentRepository.findAllCourseIdsByUserId(userId);
+    }
+
+    @Override
     public void create(Enrollment enrollment) {
         enrollmentRepository.create(enrollment);
     }

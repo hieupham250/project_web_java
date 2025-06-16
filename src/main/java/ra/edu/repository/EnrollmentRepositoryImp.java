@@ -103,6 +103,22 @@ public class EnrollmentRepositoryImp implements EnrollmentRepository {
     }
 
     @Override
+    public List<Integer> findAllCourseIdsByUserId(int userId) {
+        Session session = sessionFactory.openSession();
+        try {
+            String hql = "SELECT e.course.id FROM Enrollment e WHERE e.user.id = :userId";
+            Query<Integer> query = session.createQuery(hql, Integer.class);
+            query.setParameter("userId", userId);
+            return query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of();
+        } finally {
+            session.close();
+        }
+    }
+
+    @Override
     public void create(Enrollment enrollment) {
         Session session = sessionFactory.openSession();
         session.beginTransaction();
