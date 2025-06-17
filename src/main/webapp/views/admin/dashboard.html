@@ -1,0 +1,222 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .card-summary {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .card-summary:hover {
+            transform: translateY(-3px);
+        }
+
+        .summary-title {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .summary-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #212529;
+        }
+
+        .summary-change {
+            color: green;
+            font-size: 14px;
+        }
+
+        .best-seller {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .best-seller img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .best-seller .course-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .course-item .info {
+            margin-left: 12px;
+        }
+
+        .course-item .info h6 {
+            margin: 0;
+            font-size: 15px;
+        }
+
+        .course-item .info small {
+            color: #6c757d;
+        }
+
+        .table-scroll {
+            max-height: 350px;
+            overflow-y: auto;
+            border-radius: 12px;
+            background-color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .table-scroll table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        .table-scroll thead th {
+            background-color: #f1f3f5;
+            padding: 12px 16px;
+            font-weight: 600;
+            color: #495057;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .table-scroll tbody td {
+            padding: 12px 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f3f5;
+            color: #212529;
+            font-size: 15px;
+        }
+
+        .table-scroll tbody tr:hover {
+            background-color: #f8f9fa;
+            transition: background-color 0.2s ease;
+        }
+
+        .course-image-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #dee2e6;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .course-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .course-image-wrapper:hover {
+            transform: scale(1.05);
+        }
+
+        .table-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .table-scroll::-webkit-scrollbar-thumb {
+            background-color: #ced4da;
+            border-radius: 4px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container py-5">
+    <!-- Summary cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card card-summary p-3">
+                <span class="summary-title">TOTAL STUDENT</span>
+                <div class="summary-number" th:text="${totalStudents}">456</div>
+                <div class="summary-change">+36% ↑</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-summary p-3">
+                <span class="summary-title">TOTAL COURSE</span>
+                <div class="summary-number" th:text="${totalCourses}">56</div>
+                <div class="summary-change">+36% ↑</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-summary p-3">
+                <span class="summary-title">TOTAL ENROLLMENT</span>
+                <div class="summary-number" th:text="${totalEnrollments}">325</div>
+                <div class="summary-change">+36% ↑</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Table course statistics -->
+        <div class="col-md-8">
+            <h5>Student statistics by course</h5>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Course ID</th>
+                        <th>Image</th>
+                        <th>Course Name</th>
+                        <th>Duration</th>
+                        <th>Total Student</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="course : ${courseStats}">
+                        <td th:text="${course.id}">C001</td>
+                        <td>
+                            <div class="course-image-wrapper">
+                                <img th:src="@{${course.image}}" alt="Course Image">
+                            </div>
+                        </td>
+                        <td th:text="${course.name}">Course Name</td>
+                        <td th:text="${course.duration}">45</td>
+                        <td th:text="${course.enrollments.size}">50</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="best-seller">
+                <h6 class="mb-2 fw-bold">Top 5 course best seller</h6>
+                <p class="text-muted small">Top 5 courses with the most students</p>
+
+                <div class="course-item" th:each="course : ${top5Courses}">
+                    <img th:src="@{${course.image}}" alt="">
+                    <div class="info">
+                        <h6 th:text="${course.name}">Course Name</h6>
+                        <small><span th:text="${course.enrollments.size}">50</span> Student</small>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
