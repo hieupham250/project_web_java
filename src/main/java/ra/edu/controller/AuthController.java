@@ -70,6 +70,12 @@ public class AuthController {
 
     @PostMapping("/login")
     public String login(@RequestParam String username, @RequestParam String password, Model model, RedirectAttributes redirectAttributes, HttpSession session) {
+        if ((username == null || username.trim().isEmpty()) && (password == null || password.trim().isEmpty())) {
+            model.addAttribute("usernameError", "Tên đăng nhập không được để trống!");
+            model.addAttribute("passwordError", "Mật khẩu không được để trống!");
+            return "login";
+        }
+
         User user = authService.login(username, password);
         if (user == null) {
             model.addAttribute("error", "Tài khoản mật khẩu không chính xác!");

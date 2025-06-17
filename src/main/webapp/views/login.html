@@ -15,10 +15,12 @@
                 <div class="mb-3">
                     <label for="username">Tên đăng nhập:</label>
                     <input type="text" class="form-control" id="username" name="username"/>
+                    <div class="text-danger" th:if="${usernameError != null}" th:text="${usernameError}"></div>
                 </div>
                 <div class="mb-3">
                     <label for="password">Mật khẩu:</label>
                     <input type="password" class="form-control" id="password" name="password"/>
+                    <div class="text-danger" th:if="${passwordError != null}" th:text="${passwordError}"></div>
                 </div>
                 <div class="text-danger mb-3" th:if="${error != null}" th:text="${error}"></div>
                 <div class="d-grid">
