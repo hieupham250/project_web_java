@@ -34,7 +34,7 @@ public class EnrollmentServiceImp implements EnrollmentService {
     }
 
     @Override
-    public void create(Enrollment enrollment) {
-        enrollmentRepository.create(enrollment);
+    public boolean create(Enrollment enrollment) {
+        return enrollmentRepository.create(enrollment);
     }
 }

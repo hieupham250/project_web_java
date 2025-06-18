@@ -80,9 +80,12 @@ public class HomeController {
         enrollment.setUser(user);
         enrollment.setRegistered_at(LocalDateTime.now());
         enrollment.setStatus(StatusEnrollment.WAITING);
-        enrollmentService.create(enrollment);
 
-        redirectAttributes.addFlashAttribute("success", "Đăng ký khóa học thành công!");
+        if(enrollmentService.create(enrollment)) {
+            redirectAttributes.addFlashAttribute("success", "Đăng ký khóa học thành công!");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra khi đăng ký khóa học!");
+        }
 
         return "redirect:/home/courses";
     }

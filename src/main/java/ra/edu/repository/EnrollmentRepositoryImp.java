@@ -96,10 +96,17 @@ public class EnrollmentRepositoryImp implements EnrollmentRepository {
     @Override
     public boolean checkEnrollment(int userId, int courseId) {
         Session session = sessionFactory.openSession();
-        Query<Long> query = session.createQuery("SELECT COUNT(e.id) FROM Enrollment e WHERE e.user.id = :userId AND e.course.id = :courseId", Long.class);
-        query.setParameter("userId", userId);
-        query.setParameter("courseId", courseId);
-        return query.uniqueResult() > 0;
+        try {
+            Query<Long> query = session.createQuery("SELECT COUNT(e.id) FROM Enrollment e WHERE e.user.id = :userId AND e.course.id = :courseId", Long.class);
+            query.setParameter("userId", userId);
+            query.setParameter("courseId", courseId);
+            return query.uniqueResult() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 
     @Override
@@ -119,10 +126,18 @@ public class EnrollmentRepositoryImp implements EnrollmentRepository {
     }
 
     @Override
-    public void create(Enrollment enrollment) {
+    public boolean create(Enrollment enrollment) {
         Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        session.save(enrollment);
-        session.getTransaction().commit();
+        try {
+            session.beginTransaction();
+            session.save(enrollment);
+            session.getTransaction().commit();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 }

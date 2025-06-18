@@ -10,5 +10,5 @@ public interface EnrollmentService {
     long countWithFilter(String keyword, StatusEnrollment status, int userId);
     boolean checkEnrollment(int userId, int courseId);
     List<Integer> findAllCourseIdsByUserId(int userId);
-    void create(Enrollment enrollment);
+    boolean create(Enrollment enrollment);
 }
