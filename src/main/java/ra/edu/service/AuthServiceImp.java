@@ -26,7 +26,7 @@ public class AuthServiceImp implements AuthService {
     }
 
     @Override
-    public void register(User user) {
+    public boolean register(User user) {
         authRepository.register(user);
     }
 

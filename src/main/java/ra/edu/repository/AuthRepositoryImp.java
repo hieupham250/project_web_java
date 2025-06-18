@@ -15,44 +15,80 @@ public class AuthRepositoryImp implements AuthRepository {
     @Override
     public boolean existsByUsername(String username) {
         Session session = sessionFactory.openSession();
-        Query<Long> query = session.createQuery("SELECT COUNT(u.id) FROM User u WHERE u.username = :username", Long.class);
-        query.setParameter("username", username);
-        Long count = query.uniqueResult();
-        return count != null && count > 0;
+        try {
+            Query<Long> query = session.createQuery("SELECT COUNT(u.id) FROM User u WHERE u.username = :username", Long.class);
+            query.setParameter("username", username);
+            Long count = query.uniqueResult();
+            return count != null && count > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 
     @Override
     public boolean existsByEmail(String email) {
         Session session = sessionFactory.openSession();
-        Query<Long> query = session.createQuery("SELECT COUNT(u.id) FROM User u WHERE u.email = :email", Long.class);
-        query.setParameter("email", email);
-        Long count = query.uniqueResult();
-        return count != null && count > 0;
+        try {
+            Query<Long> query = session.createQuery("SELECT COUNT(u.id) FROM User u WHERE u.email = :email", Long.class);
+            query.setParameter("email", email);
+            Long count = query.uniqueResult();
+            return count != null && count > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 
     @Override
     public boolean existsByPhone(String phone) {
         Session session = sessionFactory.openSession();
-        Query<Long> query = session.createQuery("SELECT COUNT(u.id) FROM User u WHERE u.phone = :phone", Long.class);
-        query.setParameter("phone", phone);
-        Long count = query.uniqueResult();
-        return count != null && count > 0;
+        try {
+            Query<Long> query = session.createQuery("SELECT COUNT(u.id) FROM User u WHERE u.phone = :phone", Long.class);
+            query.setParameter("phone", phone);
+            Long count = query.uniqueResult();
+            return count != null && count > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 
     @Override
-    public void register(User user) {
+    public boolean register(User user) {
         Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        session.save(user);
-        session.getTransaction().commit();
+        try {
+            session.beginTransaction();
+            session.save(user);
+            session.getTransaction().commit();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 
     @Override
     public User login(String username, String password) {
         Session session = sessionFactory.openSession();
-        Query<User> query = session.createQuery("FROM User WHERE username =:username AND password = :password", User.class);
-        query.setParameter("username", username);
-        query.setParameter("password", password);
-        return query.uniqueResult();
+        try {
+            Query<User> query = session.createQuery("FROM User WHERE username =:username AND password = :password", User.class);
+            query.setParameter("username", username);
+            query.setParameter("password", password);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            session.close();
+        }
     }
 }

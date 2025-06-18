@@ -6,6 +6,6 @@ public interface AuthRepository {
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
     boolean existsByPhone(String phone);
-    void register(User user);
+    boolean register(User user);
     User login(String username, String password);
 }

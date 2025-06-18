@@ -10,7 +10,8 @@
 <body>
 <div class="d-flex justify-content-center align-items-center py-5 min-vh-100">
     <div style="width: 500px" class="border rounded p-4 shadow">
-        <div th:if="${message}" class="alert alert-success mb-3" th:text="${message}"></div>
+        <div th:if="${success}" class="alert alert-success mb-3" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger mb-3" th:text="${error}"></div>
         <h2 class="mb-4 text-center">Đăng ký tài khoản</h2>
         <form th:action="@{/auth/register}" th:object="${userDTO}" method="post">
             <div class="mb-3">

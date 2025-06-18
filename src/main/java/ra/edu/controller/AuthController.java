@@ -56,9 +56,11 @@ public class AuthController {
         user.setPassword(userDTO.getPassword());
         user.setCreate_at(LocalDate.now());
 
-        authService.register(user);
-
-        redirectAttributes.addFlashAttribute("message", "Đăng ký thành công!");
+        if (authService.register(user)) {
+            redirectAttributes.addFlashAttribute("success", "Đăng ký tài khoản thành công!");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Đăng ký tài khoản thất bại!");
+        }
 
         return "redirect:/auth/register";
     }
