@@ -68,11 +68,17 @@
                             </a>
                         </li>
                         <li class="nav-item">
-
                             <a class="nav-link text-white"
                                th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/students')} ? ' active' : ''"
                                th:href="@{/admin/students}">
                                 <i class="fas fa-users"></i> Học viên
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white"
+                               th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/enrollments')} ? ' active' : ''"
+                               th:href="@{/admin/enrollments}">
+                                <i class="fas fa-list"></i> Đăng ký khóa học
                             </a>
                         </li>
                     </ul>
