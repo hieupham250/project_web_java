@@ -134,6 +134,32 @@ public class EnrollmentRepositoryImp implements EnrollmentRepository {
             session.getTransaction().commit();
             return true;
         } catch (Exception e) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
+    }
+
+    @Override
+    public boolean updateStatus(int enrollmentId, StatusEnrollment newStatus) {
+        Session session = sessionFactory.openSession();
+        try {
+            session.beginTransaction();
+            Enrollment enrollment = session.get(Enrollment.class, enrollmentId);
+            if (enrollment != null) {
+                enrollment.setStatus(newStatus);
+                session.update(enrollment);
+                session.getTransaction().commit();
+            }
+            return true;
+        } catch (Exception e) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
             e.printStackTrace();
             return false;
         } finally {

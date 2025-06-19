@@ -127,7 +127,7 @@ public class CourseController {
         return "redirect:/admin/courses";
     }
 
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String deleteCourse(@PathVariable("id") int id, HttpSession session, RedirectAttributes redirectAttributes) {
         String result = checkAdminRole(session);
         if (result != null) return result;

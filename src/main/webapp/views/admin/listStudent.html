@@ -106,8 +106,10 @@
                     Bạn có chắc chắn muốn <strong id="newStatusLabel"></strong> sinh viên này không?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <a id="confirmUpdateStatusBtn" class="btn btn-primary">Xác nhận</a>
+                    <form id="updateStatusForm" method="post">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Xác nhận</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -134,7 +136,7 @@
 
     // ==== Xử lý nút Cập nhật Trạng thái ====
     const updateStatusModal = new bootstrap.Modal(document.getElementById('updateStatusModal'));
-    const confirmUpdateStatusBtn = document.getElementById('confirmUpdateStatusBtn');
+    const updateStatusForm = document.getElementById('updateStatusForm');
     const newStatusLabel = document.getElementById('newStatusLabel');
 
     document.querySelectorAll('.btn-update-status').forEach(btn => {
@@ -147,7 +149,7 @@
             newStatusLabel.innerText = newStatus === 'ACTIVE' ? 'Kích hoạt' : 'Chặn';
 
             const url = btn.getAttribute('data-url');
-            confirmUpdateStatusBtn.setAttribute('href', url);
+            updateStatusForm.setAttribute('action', url);
 
             // Hiển thị modal
             updateStatusModal.show();

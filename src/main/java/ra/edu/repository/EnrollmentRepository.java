@@ -11,4 +11,5 @@ public interface EnrollmentRepository {
     boolean checkEnrollment(int userId, int courseId);
     List<Integer> findAllCourseIdsByUserId(int userId);
     boolean create(Enrollment enrollment);
+    boolean updateStatus(int enrollmentId, StatusEnrollment newStatus);
 }

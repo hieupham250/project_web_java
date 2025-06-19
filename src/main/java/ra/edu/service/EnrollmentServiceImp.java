@@ -37,4 +37,9 @@ public class EnrollmentServiceImp implements EnrollmentService {
     public boolean create(Enrollment enrollment) {
         return enrollmentRepository.create(enrollment);
     }
+
+    @Override
+    public boolean updateStatus(int enrollmentId, StatusEnrollment newStatus) {
+        return enrollmentRepository.updateStatus(enrollmentId, newStatus);
+    }
 }

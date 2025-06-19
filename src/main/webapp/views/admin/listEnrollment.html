@@ -14,13 +14,13 @@
         <h2 class="mb-4">Danh sách đăng ký khóa học</h2>
 
         <div class="mb-4 d-flex justify-content-end align-items-center">
-            <form id="searchForm" class="d-flex" method="get" th:action="@{/home/enrollments}">
+            <form id="searchForm" class="d-flex" method="get" th:action="@{/admin/enrollments}">
                 <select class="form-select me-2" name="status" style="width: 170px;" id="filterStatus">
-                    <option th:value="${null}">Tất cả trạng thái</option>
+                    <option value="" th:selected="${status == null}">Tất cả trạng thái</option>
                     <option th:each="s : ${statusList}"
                             th:value="${s}"
                             th:text="${s}"
-                            th:selected="${s.toString() == status}"></option>
+                            th:selected="${s.toString() == status?.toString()}"></option>
                 </select>
 
                 <input class="form-control me-2" type="search" placeholder="Tìm khóa học theo tên" aria-label="Search" name="name"
@@ -59,8 +59,26 @@
                     <span th:case="'DENIED'" class="badge text-bg-danger">Bị từ chối</span>
                  </span>
                 </td>
-                <td class="text-center">
-                    <span th:if="${enrollment.status.toString() != 'WAITING'}"> - </span>
+
+                <td>
+                    <div th:if="${enrollment.status.toString() == 'WAITING'}" class="d-flex justify-content-center gap-2">
+                        <button type="button"
+                                class="btn btn-sm btn-danger btn-update-status"
+                                th:attr="data-url=@{'/admin/enrollments/(enrollmentId=' + ${enrollment.id} + ', newStatus=DENIED)'}"
+                                data-action="Từ chối">
+                            Từ chối
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-sm btn-success btn-update-status"
+                                th:attr="data-url=@{'/admin/enrollments/(enrollmentId=' + ${enrollment.id} + ', newStatus=CONFIRM)'}"
+                                data-action="Xác nhận">
+                            Xác nhận
+                        </button>
+                    </div>
+                    <div class="text-center">
+                        <span th:if="${enrollment.status.toString() != 'WAITING'}"> - </span>
+                    </div>
                 </td>
             </tr>
             </tbody>
@@ -98,5 +116,86 @@
             </ul>
         </nav>
     </div>
+
+    <!-- Modal đổi trạng thái -->
+    <div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div id="statusModalHeader" class="modal-header">
+                    <h5 class="modal-title" id="statusModalLabel">Xác nhận</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body" id="statusModalBody">
+                    Bạn có chắc chắn thực hiện hành động này?
+                </div>
+                <div class="modal-footer">
+                    <form id="statusModalForm" method="post" th:action="@{/admin/enrollments}">
+                        <input type="hidden" name="enrollmentId" id="statusModalEnrollmentId">
+                        <input type="hidden" name="newStatus" id="statusModalNewStatus">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" id="statusModalConfirmBtn" class="btn btn-primary">Xác nhận</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        const searchInput = document.getElementById('searchInput');
+        const filterStatus = document.getElementById('filterStatus')
+        const searchForm = document.getElementById('searchForm');
+
+        let typingTimer;
+        const doneTypingInterval = 500;
+
+        searchInput.addEventListener('input', () => {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => {
+                searchForm.submit();
+            }, doneTypingInterval);
+        });
+
+        filterStatus.addEventListener('change', () => {
+            searchForm.submit();
+        });
+
+        const statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
+        const statusModalConfirmBtn = document.getElementById('statusModalConfirmBtn');
+        const statusModalEnrollmentId = document.getElementById('statusModalEnrollmentId');
+        const statusModalNewStatus = document.getElementById('statusModalNewStatus');
+
+        document.querySelectorAll('.btn-update-status').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const url = btn.getAttribute('data-url');
+                const action = btn.getAttribute('data-action');
+
+                const urlParams = new URLSearchParams(url.substring(url.indexOf('(') + 1, url.indexOf(')')).replace(/, /g, '&'));
+                const enrollmentId = urlParams.get('enrollmentId');
+                const newStatus = urlParams.get('newStatus');
+
+                statusModalEnrollmentId.value = enrollmentId;
+                statusModalNewStatus.value = newStatus;
+
+                const modalHeader = document.getElementById('statusModalHeader');
+                const modalLabel = document.getElementById('statusModalLabel');
+                const modalBody = document.getElementById('statusModalBody');
+
+                modalHeader.className = 'modal-header';
+                if (action === 'Từ chối') {
+                    modalHeader.classList.add('bg-danger', 'text-white');
+                    statusModalConfirmBtn.className = 'btn btn-danger';
+                } else {
+                    modalHeader.classList.add('bg-success', 'text-white');
+                    statusModalConfirmBtn.className = 'btn btn-success';
+                }
+
+                modalLabel.textContent = `Xác nhận ${action.toLowerCase()}`;
+                modalBody.innerHTML = `Bạn có chắc chắn muốn <strong>${action.toLowerCase()}</strong> đăng ký khóa học này không?`;
+
+                statusModal.show();
+            });
+        });
+    </script>
 </body>
 </html>

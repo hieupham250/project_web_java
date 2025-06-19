@@ -19,7 +19,7 @@
         <div class="mb-4 d-flex justify-content-end align-items-center">
             <form id="searchForm" class="d-flex" th:action="@{/admin/courses}" method="get">
                 <select class="form-select me-2" name="sortDirection" style="width: 170px;" id="sortSelect">
-                    <option th:value="${null}" th:selected="${sortDirection == null}">Sắp xếp theo tên</option>
+                    <option value="" th:selected="${sortDirection == null}">Sắp xếp theo tên</option>
                     <option th:value="asc" th:selected="${sortDirection == 'asc'}">Tăng dần</option>
                     <option th:value="desc" th:selected="${sortDirection == 'desc'}">Giảm dần</option>
                 </select>
@@ -61,12 +61,13 @@
                            th:data-image="${course.image}">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <a href="#"
-                           class="btn btn-sm btn-danger btn-delete-course"
-                           th:attr="data-url=@{/admin/courses/delete/{id}(id=${course.id})}"
-                           title="Xóa">
+
+                        <button type="button"
+                                class="btn btn-sm btn-danger btn-delete-course"
+                                th:attr="data-url=@{/admin/courses/delete/{id}(id=${course.id})}"
+                                title="Xóa">
                             <i class="fas fa-trash-alt"></i>
-                        </a>
+                        </button>
                     </td>
                 </tr>
             </tbody>
@@ -104,19 +105,21 @@
     <!-- Modal Xác nhận Xóa -->
     <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="confirmDeleteModalLabel">Xác nhận Xóa</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            <form id="confirmDeleteForm" method="post">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="confirmDeleteModalLabel">Xác nhận Xóa</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                    </div>
+                    <div class="modal-body">
+                        Bạn có chắc chắn muốn xóa khóa học này không? Hành động này không thể hoàn tác.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-danger">Xác nhận</button>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    Bạn có chắc chắn muốn xóa khóa học này không? Hành động này không thể hoàn tác.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <a id="confirmDeleteBtn" class="btn btn-danger">Xác nhận</a>
-                </div>
-            </div>
+            </form>
         </div>
     </div>
 
@@ -208,13 +211,13 @@
 
         // Xử lý nút Xóa bằng Bootstrap Modal
         const confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
-        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const confirmDeleteForm = document.getElementById('confirmDeleteForm');
 
         document.querySelectorAll('.btn-delete-course').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault(); // chặn href mặc định
                 const url = btn.getAttribute('data-url');
-                confirmDeleteBtn.setAttribute('href', url); // gán link xóa vào nút xác nhận
+                confirmDeleteForm.setAttribute('action', url);
                 confirmDeleteModal.show();
             });
         });

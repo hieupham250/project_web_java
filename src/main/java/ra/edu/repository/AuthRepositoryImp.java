@@ -69,6 +69,9 @@ public class AuthRepositoryImp implements AuthRepository {
             session.getTransaction().commit();
             return true;
         } catch (Exception e) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
             e.printStackTrace();
             return false;
         } finally {

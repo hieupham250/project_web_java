@@ -15,11 +15,11 @@
         <h2 class="fw-bold text-warning">History Enrollment</h2>
         <form id="searchForm" class="d-flex" method="get" th:action="@{/home/enrollments}">
             <select class="form-select me-2" name="status" style="width: 170px;" id="filterStatus">
-                <option th:value="${null}">Tất cả trạng thái</option>
+                <option value="" th:selected="${status == null}">Tất cả trạng thái</option>
                 <option th:each="s : ${statusList}"
                         th:value="${s}"
                         th:text="${s}"
-                        th:selected="${s.toString() == status}"></option>
+                        th:selected="${s.toString() == status?.toString()}"></option>
             </select>
 
             <input class="form-control me-2" type="search" placeholder="Tìm khóa học theo tên" aria-label="Search" name="name"
@@ -59,9 +59,10 @@
                  </span>
             </td>
             <td>
-                <button class="btn btn-sm btn-danger btn-cancel-enrollment"
+                <button type="button"
+                        class="btn btn-sm btn-danger btn-cancel-enrollment"
                         th:if="${enrollment.status.toString() == 'WAITING'}"
-                        th:attr="data-url=@{/home/enrollments/cancel(id=${enrollment.id})}">
+                        th:attr="data-url=@{/home/enrollments/cancel/{id}(id=${enrollment.id})}">
                     Hủy đăng ký
                 </button>
             </td>
@@ -114,8 +115,11 @@
                 Bạn có chắc chắn muốn <strong>hủy đăng ký</strong> khóa học này không?
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <a id="confirmCancelEnrollmentBtn" class="btn btn-danger">Xác nhận hủy</a>
+
+                <form id="confirmCancelEnrollmentForm" method="post">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-danger">Xác nhận hủy</button>
+                </form>
             </div>
         </div>
     </div>
@@ -152,13 +156,13 @@
     }, 3000);
 
     const cancelEnrollmentModal = new bootstrap.Modal(document.getElementById('cancelEnrollmentModal'));
-    const confirmCancelEnrollmentBtn = document.getElementById('confirmCancelEnrollmentBtn');
+    const confirmCancelEnrollmentForm = document.getElementById('confirmCancelEnrollmentForm');
 
     document.querySelectorAll('.btn-cancel-enrollment').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             const url = btn.getAttribute('data-url');
-            confirmCancelEnrollmentBtn.setAttribute('href', url);
+            confirmCancelEnrollmentForm.setAttribute('action', url);
 
             // Hiển thị modal
             cancelEnrollmentModal.show();

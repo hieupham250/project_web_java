@@ -3,10 +3,7 @@ package ra.edu.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ra.edu.datatype.Role;
 import ra.edu.datatype.StatusEnrollment;
@@ -32,6 +29,7 @@ public class HomeController {
     @Autowired
     private EnrollmentService enrollmentService;
 
+    // ====== Phần xem tất cả khóa học ==========
     @GetMapping("/courses")
     public String courses(
             @RequestParam(required = false) String name,
@@ -60,6 +58,7 @@ public class HomeController {
         return "home";
     }
 
+    // ====== Phần xem đăng ký khóa học ==========
     @PostMapping("/register")
     public String registerCourse(@RequestParam int courseId, HttpSession session, RedirectAttributes redirectAttributes) {
         User user = checkLogin(session);
@@ -139,6 +138,27 @@ public class HomeController {
         model.addAttribute("content", "enrollments");
 
         return "home";
+    }
+
+    @PostMapping("enrollments/cancel/{id}")
+    public String cancelEnrollment(
+            @PathVariable("id") int enrollmentId,
+            HttpSession session,
+            RedirectAttributes redirectAttributes
+    ) {
+        User user = checkLogin(session);
+        if (user == null) {
+            redirectAttributes.addFlashAttribute("error", "Bạn chưa đăng nhập!");
+            return "redirect:/home/courses";
+        }
+
+        if(enrollmentService.updateStatus(enrollmentId, StatusEnrollment.CANCEL)) {
+            redirectAttributes.addFlashAttribute("success", "Hủy đăng ký thành công!");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Hủy đăng ký thất bại!");
+        }
+
+        return "redirect:/home/enrollments";
     }
 
     private User checkLogin(HttpSession session) {
