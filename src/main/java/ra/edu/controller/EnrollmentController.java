@@ -86,6 +86,7 @@ public class EnrollmentController {
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("name", name);
         model.addAttribute("status", status);
+        model.addAttribute("size", size);
         model.addAttribute("statusList", StatusEnrollment.values());
         model.addAttribute("content", "admin/listEnrollment");
     }

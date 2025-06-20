@@ -55,13 +55,14 @@ public class UserRepositoryImp implements UserRepository{
         Session session = sessionFactory.openSession();
 
         try {
-            StringBuilder hql = new StringBuilder("SELECT COUNT(u.id) FROM User u WHERE 1=1");
+            StringBuilder hql = new StringBuilder("SELECT COUNT(u.id) FROM User u WHERE u.role = :role");
 
             if (keyword != null && !keyword.trim().isEmpty()) {
                 hql.append(" AND (u.name LIKE :keyword OR u.email LIKE :keyword)");
             }
 
             Query<Long> query = session.createQuery(hql.toString(), Long.class);
+            query.setParameter("role", Role.STUDENT);
 
             if (keyword != null && !keyword.trim().isEmpty()) {
                 query.setParameter("keyword", "%" + keyword.toLowerCase() + "%");
@@ -95,6 +96,22 @@ public class UserRepositoryImp implements UserRepository{
             if (session != null && session.getTransaction().isActive()) {
                 session.getTransaction().rollback();
             }
+            return false;
+        } finally {
+            session.close();
+        }
+    }
+
+    @Override
+    public boolean updateInfo(User user) {
+        Session session = sessionFactory.openSession();
+        try {
+            session.beginTransaction();
+            session.update(user);
+            session.getTransaction().commit();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         } finally {
             session.close();

@@ -39,6 +39,17 @@ public class StudentController {
         return "admin/admin";
     }
 
+    @PostMapping("/toggle-status/{id}")
+    public String toggleUserStatus(@PathVariable int id, RedirectAttributes redirectAttributes) {
+        boolean result = userService.updateStatus(id);
+        if (result) {
+            redirectAttributes.addFlashAttribute("success", "Cập nhật trạng thái thành công!");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Cập nhật trạng thái thất bại.");
+        }
+        return "redirect:/admin/students";
+    }
+
     private void prepareStudentList(Model model, String name, String sortDirection, int page, int size) {
         List<User> users = userService.findAll(name, sortDirection, page, size);
         long totalUser = userService.countWithFilter(name);
@@ -61,19 +72,9 @@ public class StudentController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("name", name);
+        model.addAttribute("size", size);
         model.addAttribute("sortDirection", sortDirection);
         model.addAttribute("content", "admin/listStudent");
-    }
-
-    @PostMapping("/toggle-status/{id}")
-    public String toggleUserStatus(@PathVariable int id, RedirectAttributes redirectAttributes) {
-        boolean result = userService.updateStatus(id);
-        if (result) {
-            redirectAttributes.addFlashAttribute("success", "Cập nhật trạng thái thành công!");
-        } else {
-            redirectAttributes.addFlashAttribute("error", "Cập nhật trạng thái thất bại.");
-        }
-        return "redirect:/admin/students";
     }
 
     private String checkAdminRole(HttpSession session) {

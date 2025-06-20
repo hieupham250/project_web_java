@@ -26,4 +26,9 @@ public class UserServiceImp implements UserService {
     public boolean updateStatus(int id) {
         return userRepository.updateStatus(id);
     }
+
+    @Override
+    public boolean updateInfo(User user) {
+        return userRepository.updateInfo(user);
+    }
 }

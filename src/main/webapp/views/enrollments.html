@@ -11,8 +11,8 @@
         <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert" th:text="${error}"></div>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-warning">History Enrollment</h2>
+    <h2 class="fw-bold text-warning text-center m-4 fs-1">History Enrollment</h2>
+    <div class="d-flex justify-content-end align-items-center mb-4">
         <form id="searchForm" class="d-flex" method="get" th:action="@{/home/enrollments}">
             <select class="form-select me-2" name="status" style="width: 170px;" id="filterStatus">
                 <option value="" th:selected="${status == null}">Tất cả trạng thái</option>
@@ -24,6 +24,7 @@
 
             <input class="form-control me-2" type="search" placeholder="Tìm khóa học theo tên" aria-label="Search" name="name"
                    th:value="${name}" id="searchInput">
+            <button class="btn btn-primary ms-2">Search</button>
         </form>
     </div>
 

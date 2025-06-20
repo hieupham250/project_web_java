@@ -151,6 +151,11 @@ public class EnrollmentRepositoryImp implements EnrollmentRepository {
             session.beginTransaction();
             Enrollment enrollment = session.get(Enrollment.class, enrollmentId);
             if (enrollment != null) {
+                // check xem nếu admin khác đã xác nhận
+                if (enrollment.getStatus() != StatusEnrollment.WAITING) {
+                    session.getTransaction().rollback();
+                    return false;
+                }
                 enrollment.setStatus(newStatus);
                 session.update(enrollment);
                 session.getTransaction().commit();

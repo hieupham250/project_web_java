@@ -3,18 +3,24 @@ package ra.edu.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ra.edu.datatype.Role;
 import ra.edu.datatype.StatusEnrollment;
+import ra.edu.dto.ChangePasswordDTO;
 import ra.edu.dto.EnrollmentConvertDTO;
+import ra.edu.dto.ProfileDTO;
 import ra.edu.entity.Course;
 import ra.edu.entity.Enrollment;
 import ra.edu.entity.User;
+import ra.edu.service.AuthService;
 import ra.edu.service.CourseService;
 import ra.edu.service.EnrollmentService;
+import ra.edu.service.UserService;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -29,13 +35,18 @@ public class HomeController {
     @Autowired
     private EnrollmentService enrollmentService;
 
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private AuthService authService;
+
     // ====== Phần xem tất cả khóa học ==========
     @GetMapping("/courses")
     public String courses(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String sortDirection,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "8") int size,
+            @RequestParam(defaultValue = "5") int size,
             Model model,
             HttpSession session) {
         List<Course> courses = courseService.findAll(name, sortDirection, page, size);
@@ -46,6 +57,8 @@ public class HomeController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("name", name);
+        model.addAttribute("size", size);
+        model.addAttribute("sortDirection", sortDirection);
 
         User user = checkLogin(session);
         List<Integer> registeredCourseIds = new ArrayList<>();
@@ -58,7 +71,6 @@ public class HomeController {
         return "home";
     }
 
-    // ====== Phần xem đăng ký khóa học ==========
     @PostMapping("/register")
     public String registerCourse(@RequestParam int courseId, HttpSession session, RedirectAttributes redirectAttributes) {
         User user = checkLogin(session);
@@ -133,6 +145,7 @@ public class HomeController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("name", name);
+        model.addAttribute("size", size);
         model.addAttribute("status", status);
         model.addAttribute("statusList", StatusEnrollment.values());
         model.addAttribute("content", "enrollments");
@@ -159,6 +172,120 @@ public class HomeController {
         }
 
         return "redirect:/home/enrollments";
+    }
+
+    // ====== Phần profile ==========
+    @GetMapping("/profile")
+    public String profile(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        User user = checkLogin(session);
+        if (user == null) {
+            redirectAttributes.addFlashAttribute("error", "Bạn chưa đăng nhập!");
+            return "redirect:/home/courses";
+        }
+
+        ProfileDTO profileDTO = new ProfileDTO();
+        profileDTO.setId(user.getId());
+        profileDTO.setName(user.getName());
+        profileDTO.setPhone(user.getPhone());
+        profileDTO.setEmail(user.getEmail());
+        profileDTO.setSex(user.isSex());
+        profileDTO.setDob(user.getDob());
+
+        model.addAttribute("profileDTO", profileDTO);
+        model.addAttribute("changePasswordDTO", new ChangePasswordDTO());
+        model.addAttribute("content", "profile");
+        return "home";
+    }
+
+    @PostMapping("/update")
+    public String updateProfileInfo(
+            @Valid @ModelAttribute("profileDTO") ProfileDTO profileDTO,
+            BindingResult bindingResult,
+            HttpSession session,
+            Model model,
+            RedirectAttributes redirectAttributes
+    ) {
+        User user = checkLogin(session);
+        if (user == null) {
+            redirectAttributes.addFlashAttribute("error", "Bạn chưa đăng nhập!");
+            return "redirect:/home/courses";
+        }
+
+        if (!profileDTO.getPhone().equals(user.getPhone()) && authService.existsByPhone(profileDTO.getPhone())) {
+            bindingResult.rejectValue("phone", "error.profileDTO", "Số điện thoại đã tồn tại");
+        }
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("profileDTO", profileDTO);
+            model.addAttribute("changePasswordDTO", new ChangePasswordDTO());
+            model.addAttribute("content", "profile");
+            return "home";
+        }
+
+        user.setName(profileDTO.getName());
+        user.setPhone(profileDTO.getPhone());
+        user.setSex(profileDTO.getSex());
+        user.setDob(profileDTO.getDob());
+
+        if(userService.updateInfo(user)) {
+            redirectAttributes.addFlashAttribute("success", "Cập nhật thông tin thành công!");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Cập nhật thông tin thất bại!");
+        }
+
+        return "redirect:/home/profile";
+    }
+
+    @PostMapping("/change-password")
+    public String changePassword(
+            @Valid @ModelAttribute("changePasswordDTO") ChangePasswordDTO changePasswordDTO,
+            BindingResult bindingResult,
+            HttpSession session,
+            Model model,
+            RedirectAttributes redirectAttributes
+    ) {
+        User user = checkLogin(session);
+        if (user == null) {
+            redirectAttributes.addFlashAttribute("error", "Bạn chưa đăng nhập!");
+            return "redirect:/home/courses";
+        }
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("profileDTO", new ProfileDTO());
+            model.addAttribute("content", "profile");
+            model.addAttribute("showChangePasswordModal", true);
+            return "home";
+        }
+
+        // Kiểm tra mật khẩu cũ
+        if (!user.getPassword().equals(changePasswordDTO.getOldPassword())) {
+            bindingResult.rejectValue("oldPassword", "error.changePasswordDTO", "Mật khẩu cũ không đúng");
+            model.addAttribute("profileDTO", new ProfileDTO());
+            model.addAttribute("content", "profile");
+            model.addAttribute("showChangePasswordModal", true);
+            return "home";
+        }
+
+        // Kiểm tra confirm password
+        if (!changePasswordDTO.getNewPassword().equals(changePasswordDTO.getConfirmPassword())) {
+            bindingResult.rejectValue("confirmPassword", "error.changePasswordDTO", "Xác nhận mật khẩu không khớp");
+            model.addAttribute("profileDTO", new ProfileDTO());
+            model.addAttribute("content", "profile");
+            model.addAttribute("showChangePasswordModal", true);
+            return "home";
+        }
+
+        // Cập nhật mật khẩu
+        user.setPassword(changePasswordDTO.getNewPassword());
+        if (userService.updateInfo(user)) {
+            session.removeAttribute("user");
+            redirectAttributes.addFlashAttribute("success", "Thay đổi mật khẩu thành công!");
+            return "redirect:/auth/login";
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Thay đổi mật khẩu thất bại!");
+        }
+
+        return "redirect:/home/profile";
     }
 
     private User checkLogin(HttpSession session) {

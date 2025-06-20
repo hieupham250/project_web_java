@@ -88,12 +88,13 @@ public class AuthController {
             session.setAttribute("user", user);
             redirectAttributes.addFlashAttribute("success", "Đăng nhập thành công!");
             if (user.getRole() == Role.ADMIN) {
-                return "redirect:/admin";
+                return "redirect:/admin/dashboard";
             } else {
                 return "redirect:/home/courses";
             }
         } else if (user.getStatus() == StatusAccount.INACTIVE) {
             redirectAttributes.addFlashAttribute("error", "Tài khoản của bạn đã bị khóa!");
+            return "redirect:/auth/login";
         }
         return "login";
     }

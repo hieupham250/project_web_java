@@ -166,6 +166,7 @@ public class CourseController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("name", name);
+        model.addAttribute("size", size);
         model.addAttribute("sortDirection", sortDirection);
         model.addAttribute("content", "admin/listCourse");
     }
